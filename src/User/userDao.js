@@ -4,7 +4,7 @@ export const selectSingleEmail = async(connection, email) =>{
 
     const existUserId = await connection.query(selectEmailQuery)
 
-    return existUserId[0].length > 0
+    return existUserId[0][0].Id
 }
 
 export const createUserEmail = async(connection, userEmail, userProfile) =>{

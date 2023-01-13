@@ -38,4 +38,7 @@ export const finishKakaoRedirect = async(req,res) =>{
     const result = await startWithKakao(userProfile, userEmail)
     if(result === "join")
         res.send("join 1st process success!")
+    else{
+        res.send(result);
+    }
 }
