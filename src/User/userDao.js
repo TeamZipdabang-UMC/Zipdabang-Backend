@@ -24,3 +24,9 @@ export const insertUserData = async(connection, dataParma, email) =>{
     const insertResult = await connection.query(insertUserDataQuery, dataParma)
     return insertResult
 }
+
+export const insertNewUser = async(connection, dataParam) =>{
+    const insertUserQuery = `insert into user(name, email, phone_num, age, nickname, password, gender) values (?,?,?,?,?,?,?);`
+    const insertResult = await connection.query(insertUserQuery, dataParam);
+    return insertResult[0].affectedRows
+}

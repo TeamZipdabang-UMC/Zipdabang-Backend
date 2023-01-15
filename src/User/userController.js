@@ -2,7 +2,7 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
+import { addUser, finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
 import { checkExistNickname } from "./userProvider";
 
 export const startKakaoRedirect = async(req,res)=>{
@@ -167,5 +167,96 @@ export const postUserDataSocial = async(req,res) =>{
         }
 
         res.send(JSON.stringify(responseObj));
+    }
+}
+
+export const postUser = async(req, res) =>{
+
+    const {email, name, nickname, birth, password, passwordCheck, phoneNum} = req.body
+
+    const expressionErrorObj = {
+        status : "expression error",
+        type : ``
+    }
+
+    const existErrorObj = {
+        status : "data exist error",
+        type : ``
+    }
+
+    if (!name)
+    {
+        existErrorObj.type = `name`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!nickname){
+        existErrorObj.type = `nickname`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!phoneNum){
+        existErrorObj.type = `phoneNum`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!birth){
+        existErrorObj.type = `birth`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!email){
+        existErrorObj.type = `email`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!password){
+        existErrorObj.type = `password`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!passwordCheck){
+        existErrorObj.type = `password check`
+        res.send(JSON.stringify(existErrorObj))
+    }
+
+    if (!regexEmail.test(email))
+    {
+        expressionErrorObj.type = `email`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (name.length <= 0 || name.length > 10)
+    {
+        expressionErrorObj.type = `name`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (nickname.length <= 1 || nickname.length > 10)
+    {
+        expressionErrorObj.type = `nickname`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (phoneNum.length != 11)
+    {
+        expressionErrorObj.type = `phone number`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (birth.length != 8 || birth[6] != '-'){
+        expressionErrorObj.type = `birth`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (password != passwordCheck){
+        expressionErrorObj.type = `password do not match with password check`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+
+    const dataObj = req.body;
+    const result = await addUser(dataObj);
+
+    if (result){
+        const responseObj = {
+            status : "joined!",
+            success : true,
+            info : {
+                name : dataObj.name,
+                nickname : dataObj.nickname,
+                email : dataObj.email
+            }
+        }
+        
+        res.send(JSON.stringify(responseObj))
     }
 }
