@@ -14,9 +14,9 @@ export const createUserEmail = async(connection, userEmail, userProfile) =>{
 }
 
 export const selectUserByNickname = async(connection, nickname) =>{
-    const selectUserNicknameQuery = ``;
-    const selectResult = await connection.query(selectEmailQuery)
-    console.log(selectResult);
+    const selectUserNicknameQuery = `select Id from user where nickname = '${nickname}'`;
+    const selectResult = await connection.query(selectUserNicknameQuery)
+    return selectResult[0][0];
 }
 
 export const insertUserData = async(connection, dataParma, email) =>{

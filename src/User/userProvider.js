@@ -13,5 +13,5 @@ export const checkExistEmail = async(email)=>{
 export const checkExistNickname = async(nickname) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectUserByNickname(connection, nickname);
-    
+    return result
 }

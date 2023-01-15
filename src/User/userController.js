@@ -3,6 +3,7 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
+import { checkExistNickname } from "./userProvider";
 
 export const startKakaoRedirect = async(req,res)=>{
     const nextUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&response_type=code`;
@@ -79,6 +80,21 @@ export const finishGoogleRedirect = async(req, res) =>{
 export const findExistNickname = async(req,res)=>{
     const {nickname} = req.query
     
+    const result = await checkExistNickname(nickname);
+    if (result){
+        const responseObj = {
+            status : "exist",
+            isExist : true
+        }
+        res.send(JSON.stringify(responseObj))
+    }
+    else{
+        const responseObj = {
+            status : "not exist",
+            isExist : false
+        }
+        res.send(JSON.stringify(responseObj))
+    }
 }
 
 export const postUserDataSocial = async(req,res) =>{
