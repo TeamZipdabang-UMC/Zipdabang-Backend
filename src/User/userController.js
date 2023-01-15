@@ -2,7 +2,7 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { kakaoLogin, startWithKakao } from "./userService";
+import { finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
 
 export const startKakaoRedirect = async(req,res)=>{
     const nextUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&response_type=code`;
@@ -40,5 +40,116 @@ export const finishKakaoRedirect = async(req,res) =>{
         res.send("join 1st process success!")
     else{
         res.send(result);
+    }
+}
+
+export const startGoogleRedirect = async(req, res) =>{
+    const nextUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${privateInfo.GOOGLE_CLIENT_ID}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`;
+    res.redirect(nextUrl);
+}
+
+export const finishGoogleRedirect = async(req, res) =>{
+    const code = req.query.code
+    const apiUrl = `https://oauth2.googleapis.com/token?code=${code}&client_id=${privateInfo.GOOGLE_CLIENT_ID}&client_secret=${privateInfo.GOOGLE_CLENT_PASS}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&grant_type=authorization_code`;
+
+    const getGoolgeApi = await fetch(apiUrl,{
+        method : "POST",
+        headers: {
+            "Content-type" : "application/json"
+        }
+    });
+    const googleToken = await getGoolgeApi.json();
+
+    const getUserUri = `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${googleToken.access_token}`
+    const userData = await fetch(getUserUri,{
+        method : "GET",
+        headers: {
+            Authrization : `Bearer ${googleToken.access_token}`
+        }
+    });
+
+    const User = await userData.json();
+    
+    const result = await startWithGoogle(User.picture, User.email);
+
+    res.send(JSON.stringify(result));
+
+}
+
+export const findExistNickname = async(req,res)=>{
+    const {nickname} = req.query
+    
+}
+
+export const postUserDataSocial = async(req,res) =>{
+    const {name, nickname, phoneNum, birth, email} = req.body
+
+    const expressionErrorObj = {
+        status : "expression error",
+        type : ``
+    }
+
+    const existErrorObj = {
+        status : "data exist error",
+        type : ``
+    }
+
+    if (!name)
+    {
+        existErrorObj.type = `name`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!nickname){
+        existErrorObj.type = `nickname`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!phoneNum){
+        existErrorObj.type = `phoneNum`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!birth){
+        existErrorObj.type = `birth`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!email){
+        existErrorObj.type = `email`
+        res.send(JSON.stringify(existErrorObj))
+    }
+
+    if (!regexEmail.test(email))
+    {
+        expressionErrorObj.type = `email`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (name.length <= 0 || name.length > 10)
+    {
+        expressionErrorObj.type = `name`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (nickname.length <= 1 || nickname.length > 10)
+    {
+        expressionErrorObj.type = `nickname`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (phoneNum.length != 11)
+    {
+        expressionErrorObj.type = `phone number`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+    else if (birth.length != 8 || birth[6] != '-'){
+        expressionErrorObj.type = `birth`
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+
+    const dataObj = req.body
+    const result = finishSocialLogin(dataObj);
+    if (result)
+    {
+        const responseObj = {
+            status : "success",
+            info: dataObj
+        }
+
+        res.send(JSON.stringify(responseObj));
     }
 }
