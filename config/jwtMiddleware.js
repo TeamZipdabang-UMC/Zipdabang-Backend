@@ -1,3 +1,5 @@
+import privateInfo from "./privateInfo";
+
 export const jwtMiddleware = (req,res,next) =>{
     // read the token from header or url
     const token = req.headers['x-access-token']
@@ -9,7 +11,7 @@ export const jwtMiddleware = (req,res,next) =>{
     // create a promise that decodes the token
     const p = new Promise(
         (resolve, reject) => {
-            jwt.verify(token, secret_config.jwtsecret , (err, verifiedToken) => {
+            jwt.verify(token, privateInfo.JWT_SECRET , (err, verifiedToken) => {
                 if(err) reject(err);
                 resolve(verifiedToken)
             })
