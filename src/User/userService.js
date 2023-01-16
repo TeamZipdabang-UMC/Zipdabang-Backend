@@ -39,6 +39,7 @@ export const startWithGoogle = async(userProfile, userEmail) => {
     
     const isLogin = await checkExistEmail(userEmail)
 
+    console.log(isLogin)
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
@@ -54,7 +55,7 @@ export const startWithGoogle = async(userProfile, userEmail) => {
     }
     else{
         let token = await jwt.sign({
-            userId : isLogin[0].id,
+            userId : isLogin[0].Id,
             userEmail : userEmail,
         },
         privateInfo.JWT_SECRET,
@@ -126,3 +127,4 @@ export const addUser = async(dataObj) =>{
     const result = await insertNewUser(connection, dataParam);
     return result
 }
+

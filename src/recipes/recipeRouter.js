@@ -4,4 +4,4 @@ const recipeRouter = express.Router();
 
 export default recipeRouter
 
-recipeRouter.get('/category/:categoryId', getCategory);
+recipeRouter.get('/category/:categoryId([0-9]+)', getCategory);

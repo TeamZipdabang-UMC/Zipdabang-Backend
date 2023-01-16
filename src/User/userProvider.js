@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname } from "./userDao"
+import { selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserScrapFirst, selectUserScrapNext } from "./userDao"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo"
@@ -55,4 +55,16 @@ export const login = async(email, password) =>{
             token
         }
     }
+}
+
+export const getMyScrap = async(userId) =>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await selectUserScrapFirst(connection, userId);
+    return result
+}
+
+export const getNextScrap = async(userId, recipeId) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await selectUserScrapNext(connection, userId, recipeId)
+    return result
 }

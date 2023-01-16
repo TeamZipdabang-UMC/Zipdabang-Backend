@@ -26,7 +26,7 @@ export const insertUserData = async(connection, dataParma, email) =>{
 }
 
 export const insertNewUser = async(connection, dataParam) =>{
-    const insertUserQuery = `insert into user(name, email, phone_num, age, nickname, password, gender) values (?,?,?,?,?,?,?);`
+    const insertUserQuery = `insert into user(name, email, phone_num, age, nickname, password,is_social,gender) values (?,?,?,?,?,?,0,?);`
     const insertResult = await connection.query(insertUserQuery, dataParam);
     return insertResult[0].affectedRows
 }
@@ -41,4 +41,16 @@ export const selectPassword = async(connection, email) =>{
     const selectPasswordQuery = `select Id, password from User where email = '${email}';`
     const selectResult = await connection.query(selectPasswordQuery);
     return selectResult[0][0]
+}
+
+export const selectUserScrapFirst = async(connection, userId) =>{
+    const selectUserScrapFirstQuery = `select target_recipe from Scrap where owner = ${userId} order by created_at DESC LIMIT 3;`
+    const selectResult = await connection.query(selectUserScrapFirstQuery);
+    return selectResult[0]
+}
+
+export const selectUserScrapNext = async(connection, userId, recipeId) =>{
+    const selectUserScrapNextQuery = `select target_recipe from Scrap where owner = ${userId} and created_at < (select created_at from Scrap where target_recipe = ${recipeId}) order by created_at DESC LIMIT 3;`
+    const selectResult = await connection.query(selectUserScrapNextQuery)
+    return selectResult[0]
 }
