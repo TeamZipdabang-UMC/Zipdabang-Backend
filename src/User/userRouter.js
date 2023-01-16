@@ -1,5 +1,5 @@
 import express from 'express'
-import { findExistNickname, finishGoogleRedirect, finishKakaoRedirect, kakaoLogin, postUser, postUserDataSocial, startGoogleRedirect, startKakaoRedirect } from './userController';
+import { findExistNickname, finishGoogleRedirect, finishKakaoRedirect, kakaoLogin, postUser, postUserDataSocial, signIn, startGoogleRedirect, startKakaoRedirect } from './userController';
 
 const userRouter = express.Router();
 
@@ -12,4 +12,4 @@ userRouter.get('/google/finish',finishGoogleRedirect);
 userRouter.get('/exist-nickname',findExistNickname);
 userRouter.post('/user-data/social-login',postUserDataSocial);
 userRouter.post('/new-user',postUser)
-
+userRouter.post('/sign-in',signIn)

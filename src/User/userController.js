@@ -1,9 +1,9 @@
-
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { addUser, finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistNickname } from "./userProvider";
+import { checkExistNickname, login } from "./userProvider";
+
 
 export const startKakaoRedirect = async(req,res)=>{
     const nextUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&response_type=code`;
@@ -257,6 +257,57 @@ export const postUser = async(req, res) =>{
             }
         }
         
+        res.send(JSON.stringify(responseObj))
+    }
+}
+
+export const signIn = async(req, res) =>{
+    const {email, password} = req.body
+    const expressionErrorObj = {
+        status : "expression error",
+        type : ``
+    }
+
+    const existErrorObj = {
+        status : "data exist error",
+        type : ``
+    }
+
+    if (!email){
+        existErrorObj.type = `email`
+        res.send(JSON.stringify(existErrorObj))
+    }
+    else if (!password){
+        existErrorObj.type = `password`
+        res.send(JSON.stringify(existErrorObj))
+    }
+
+    if (!regexEmail.test(email)){
+        expressionErrorObj.type = 'email',
+        res.send(JSON.stringify(expressionErrorObj))
+    }
+
+    const result = await login(email, password);
+    console.log(result)
+    if (!result.success && result.status == 'email')
+    {
+        const responseObj = {
+            status : "login fail",
+            error : "such user that have email not exist"
+        }
+
+        res.send(JSON.stringify(responseObj))
+    }
+    else if (!result.success && result.status == 'password'){
+        const responseObj = {
+            status : "login fail",
+            error : "password is wrong"
+        }
+
+        res.send(JSON.stringify(responseObj))
+    }
+    else{
+        const responseObj = result
         res.send(JSON.stringify(responseObj))
     }
 }

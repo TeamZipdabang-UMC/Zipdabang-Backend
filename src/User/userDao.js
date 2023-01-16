@@ -30,3 +30,15 @@ export const insertNewUser = async(connection, dataParam) =>{
     const insertResult = await connection.query(insertUserQuery, dataParam);
     return insertResult[0].affectedRows
 }
+
+export const selectByEmail = async(connection, email) =>{
+    const selectQuery = `select Id from user where email = '${email}'`;
+    const selectResult = await connection.query(selectQuery)
+    return selectResult[0][0]
+}
+
+export const selectPassword = async(connection, email) =>{
+    const selectPasswordQuery = `select Id, password from User where email = '${email}';`
+    const selectResult = await connection.query(selectPasswordQuery);
+    return selectResult[0][0]
+}
