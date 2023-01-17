@@ -14,9 +14,26 @@ export const startWithKakao = async(userProfile, userEmail)=>{
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
-        connection.release();
         if (result > 0)
-            return "join"
+        {
+            const addedUser = await checkExistEmail(userEmail);
+            let token = await jwt.sign({
+                userId : addedUser[0].Id,
+                userEmail,
+            },
+            privateInfo.JWT_SECRET,
+            {
+                expiresIn : "30d",
+                subject : "userInfo"
+            });
+            connection.release()
+            
+            const responseObj = {
+                status : "join",
+                token
+            }
+            return responseObj
+        }
     }
     else{
         // 이미 이메일이 있다? -> 로그인 시키기
@@ -31,7 +48,11 @@ export const startWithKakao = async(userProfile, userEmail)=>{
             subject : "userInfo"
         });
 
-        return token
+        const responseObj = {
+            status : "login",
+            token
+        }
+        return responseObj
     }
 }
 
@@ -43,12 +64,23 @@ export const startWithGoogle = async(userProfile, userEmail) => {
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
-        connection.release();
         
         if (result > 0){
+            const addedUser = await checkExistEmail(userEmail);
+            let token = await jwt.sign({
+                userId : addedUser[0].Id,
+                userEmail,
+            },
+            privateInfo.JWT_SECRET,
+            {
+                expiresIn : "30d",
+                subject : "userInfo"
+            });
+            connection.release()
+
             const responseObj = {
                 status : "join",
-                joinedEmail : `${userEmail}`
+                token
             }
             return responseObj;
         }

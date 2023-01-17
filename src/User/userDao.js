@@ -1,6 +1,6 @@
 
 export const selectSingleEmail = async(connection, email) =>{
-    const selectEmailQuery = `SELECT Id FROM USER WHERE EMAIL ='${email}'`
+    const selectEmailQuery = `select Id from user where email= '${email}';`
 
     const existUserId = await connection.query(selectEmailQuery)
     
@@ -38,19 +38,19 @@ export const selectByEmail = async(connection, email) =>{
 }
 
 export const selectPassword = async(connection, email) =>{
-    const selectPasswordQuery = `select Id, password from User where email = '${email}';`
+    const selectPasswordQuery = `select Id, password from user where email = '${email}';`
     const selectResult = await connection.query(selectPasswordQuery);
     return selectResult[0][0]
 }
 
 export const selectUserScrapFirst = async(connection, userId) =>{
-    const selectUserScrapFirstQuery = `select target_recipe from Scrap where owner = ${userId} order by created_at DESC LIMIT 3;`
+    const selectUserScrapFirstQuery = `select target_recipe from scrap where owner = ${userId} order by created_at DESC LIMIT 3;`
     const selectResult = await connection.query(selectUserScrapFirstQuery);
     return selectResult[0]
 }
 
 export const selectUserScrapNext = async(connection, userId, recipeId) =>{
-    const selectUserScrapNextQuery = `select target_recipe from Scrap where owner = ${userId} and created_at < (select created_at from Scrap where target_recipe = ${recipeId}) order by created_at DESC LIMIT 3;`
+    const selectUserScrapNextQuery = `select target_recipe from scrap where owner = ${userId} and created_at < (select created_at from scrap where target_recipe = ${recipeId}) order by created_at DESC LIMIT 3;`
     const selectResult = await connection.query(selectUserScrapNextQuery)
     return selectResult[0]
 }
