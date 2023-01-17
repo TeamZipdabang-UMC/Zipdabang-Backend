@@ -2,7 +2,7 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { addUser, finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistNickname, login } from "./userProvider";
+import { checkExistNickname, getMyScrap, getNextScrap, login } from "./userProvider";
 
 
 export const startKakaoRedirect = async(req,res)=>{
@@ -100,6 +100,7 @@ export const findExistNickname = async(req,res)=>{
 export const postUserDataSocial = async(req,res) =>{
     const {name, nickname, phoneNum, birth, email} = req.body
 
+    console.log(req.body)
     const expressionErrorObj = {
         status : "expression error",
         type : ``
@@ -310,4 +311,27 @@ export const signIn = async(req, res) =>{
         const responseObj = result
         res.send(JSON.stringify(responseObj))
     }
+}
+
+export const getMyPageFirst = async(req, res) =>{
+    const {userId, userEmail} = req.verifiedToken;
+    
+    const myScrapResult = await getMyScrap(userId);
+    const myPageResponse = 
+    {
+        myScrap : myScrapResult,
+    }
+
+    res.send(JSON.stringify(myPageResponse))
+}
+
+export const getMyScrapUpdate = async(req, res) =>{
+    const {userId, userEmail} = req.verifiedToken
+    const {recipeId} = req.query
+    const myNextScrapResult = await getNextScrap(userId, recipeId)
+    
+    const myPageResponse = {
+        myScrap : myNextScrapResult
+    }
+    res.send(JSON.stringify(myPageResponse))
 }
