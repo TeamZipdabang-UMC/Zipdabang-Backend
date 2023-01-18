@@ -7,10 +7,11 @@ import bcrypt from "bcrypt"
 
 
 
-export const startWithKakao = async(userProfile, userEmail)=>{
+export const startWithKakao = async(userEmail, userProfile)=>{
 
     const isLogin = await checkExistEmail(userEmail)
 
+    console.log("isLogin" , isLogin)
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
@@ -56,7 +57,7 @@ export const startWithKakao = async(userProfile, userEmail)=>{
     }
 }
 
-export const startWithGoogle = async(userProfile, userEmail) => {
+export const startWithGoogle = async(userEmail, userProfile) => {
     
     const isLogin = await checkExistEmail(userEmail)
 
@@ -160,3 +161,6 @@ export const addUser = async(dataObj) =>{
     return result
 }
 
+export const deleteScraps = async(targets) =>{
+    console.log(targets)
+}

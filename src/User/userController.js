@@ -1,8 +1,8 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { addUser, finishSocialLogin, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistNickname, getMyScrap, getNextScrap, login } from "./userProvider";
+import { addUser, deleteScraps, finishSocialLogin, startWithGoogle, startWithKakao } from "./userService";
+import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap } from "./userProvider";
 
 
 // export const startKakaoRedirect = async(req,res)=>{
@@ -13,6 +13,7 @@ import { checkExistNickname, getMyScrap, getNextScrap, login } from "./userProvi
 export const kakaoLogin = async(req, res) =>{
     const {userEmail, userProfile} = req.body
 
+    console.log(userEmail, userProfile)
     const result = await startWithKakao(userEmail, userProfile);
     res.send(JSON.stringify(result))
 }
@@ -54,38 +55,38 @@ export const googleLogin = async(req, res) =>{
 //     res.send(JSON.stringify(result))
 // }
 
-export const startGoogleRedirect = async(req, res) =>{
-    const nextUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${privateInfo.GOOGLE_CLIENT_ID}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`;
-    res.redirect(nextUrl);
-}
+// export const startGoogleRedirect = async(req, res) =>{
+//     const nextUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${privateInfo.GOOGLE_CLIENT_ID}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`;
+//     res.redirect(nextUrl);
+// }
 
-export const finishGoogleRedirect = async(req, res) =>{
-    const code = req.query.code
-    const apiUrl = `https://oauth2.googleapis.com/token?code=${code}&client_id=${privateInfo.GOOGLE_CLIENT_ID}&client_secret=${privateInfo.GOOGLE_CLENT_PASS}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&grant_type=authorization_code`;
+// export const finishGoogleRedirect = async(req, res) =>{
+//     const code = req.query.code
+//     const apiUrl = `https://oauth2.googleapis.com/token?code=${code}&client_id=${privateInfo.GOOGLE_CLIENT_ID}&client_secret=${privateInfo.GOOGLE_CLENT_PASS}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&grant_type=authorization_code`;
 
-    const getGoolgeApi = await fetch(apiUrl,{
-        method : "POST",
-        headers: {
-            "Content-type" : "application/json"
-        }
-    });
-    const googleToken = await getGoolgeApi.json();
+//     const getGoolgeApi = await fetch(apiUrl,{
+//         method : "POST",
+//         headers: {
+//             "Content-type" : "application/json"
+//         }
+//     });
+//     const googleToken = await getGoolgeApi.json();
 
-    const getUserUri = `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${googleToken.access_token}`
-    const userData = await fetch(getUserUri,{
-        method : "GET",
-        headers: {
-            Authrization : `Bearer ${googleToken.access_token}`
-        }
-    });
+//     const getUserUri = `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${googleToken.access_token}`
+//     const userData = await fetch(getUserUri,{
+//         method : "GET",
+//         headers: {
+//             Authrization : `Bearer ${googleToken.access_token}`
+//         }
+//     });
 
-    const User = await userData.json();
+//     const User = await userData.json();
     
-    const result = await startWithGoogle(User.picture, User.email);
+//     const result = await startWithGoogle(User.picture, User.email);
 
-    res.send(JSON.stringify(result));
+//     res.send(JSON.stringify(result));
 
-}
+// }
 
 export const findExistNickname = async(req,res)=>{
     const {nickname} = req.query
@@ -323,25 +324,61 @@ export const postUser = async(req, res) =>{
 //     }
 // }
 
-export const getMyPageFirst = async(req, res) =>{
+export const getMyPage = async(req, res) =>{
     const {userId, userEmail} = req.verifiedToken;
+    const myScrapResult = await getMyScrapOverView(userId);
+    const myChallengingResult = await getMyChallengingOverView(userId);
+    const myCompleteResponse = await getMyCompleteOverView(userId);
     
-    const myScrapResult = await getMyScrap(userId);
-    const myPageResponse = 
-    {
-        myScrap : myScrapResult,
+    const myPageResponse = {
+        myScrapOverView : myScrapResult,
+        myChallengingOverView : myChallengingResult,
+        myCompleteOverView : myCompleteResponse
     }
 
     res.send(JSON.stringify(myPageResponse))
 }
 
-export const getMyScrapUpdate = async(req, res) =>{
+export const getMyScrap = async(req, res) =>{
     const {userId, userEmail} = req.verifiedToken
-    const {recipeId} = req.query
-    const myNextScrapResult = await getNextScrap(userId, recipeId)
+    const myAllScrap = await getMyScrapAll(userId)
     
-    const myPageResponse = {
-        myScrap : myNextScrapResult
+    const response = {
+        myScrap : myAllScrap
     }
-    res.send(JSON.stringify(myPageResponse))
+    res.send(JSON.stringify(response))
+}
+
+export const getMyChallenging = async(req, res) => {
+    const {userId, userEmail} = req.verifiedToken
+    const myAllChallenging = await getMyChallengingAll(userId)
+
+    const response = {
+        myChallenging : myAllChallenging
+    }
+    res.send(JSON.stringify(response))
+}
+
+export const getMyComeplete = async(req, res) =>{
+    const {userId, userEmail} = req.verifiedToken
+    const myAllComplete = await getMyChallengingAll(userId)
+
+    const response = {
+        myChallenging : myAllComplete
+    }
+    res.send(JSON.stringify(response))
+}
+
+export const deleteMyScrap = async(req, res) =>{
+    const targets = req.body
+    
+    if (targets.lengh == 0 )
+    {
+        const responseObj = {
+            success : false,
+            error : "삭제할 레시피들의 아이디를 보내주세요"
+        }
+        res.send(JSON.stringify(responseObj))
+    }
+    const result = await deleteScraps(targets)
 }

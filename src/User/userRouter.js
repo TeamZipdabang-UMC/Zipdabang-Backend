@@ -1,6 +1,6 @@
 import express from 'express'
 import { jwtMiddleware } from '../../config/jwtMiddleware';
-import { findExistNickname, getMyPageFirst, getMyScrapUpdate, googleLogin, kakaoLogin,  postUserDataSocial } from './userController';
+import { deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  googleLogin, kakaoLogin,  postUserDataSocial } from './userController';
 
 const userRouter = express.Router();
 
@@ -17,5 +17,8 @@ userRouter.get('/exist-nickname',findExistNickname);
 userRouter.post('/user-data',postUserDataSocial);
 // userRouter.post('/new-user',postUser)
 // userRouter.post('/sign-in',signIn)
-userRouter.get('/:id([0-9]+)',jwtMiddleware,getMyPageFirst)
-userRouter.get('/:id([0-9]+)/next-scrap', jwtMiddleware,getMyScrapUpdate)
+userRouter.get('/:id([0-9]+)',jwtMiddleware,getMyPage)
+userRouter.get('/:id([0-9]+)/my-scrap', jwtMiddleware,getMyScrap)
+userRouter.get('/:id([0-9]+)/my-challenging', jwtMiddleware, getMyChallenging)
+userRouter.get('/:id([0-9]+)/my-complete', jwtMiddleware, getMyComeplete)
+userRouter.delete('/:id([0-9]+)/my-scrap/delete', jwtMiddleware, deleteMyScrap)

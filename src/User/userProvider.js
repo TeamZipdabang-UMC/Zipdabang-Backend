@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserScrapFirst, selectUserScrapNext } from "./userDao"
+import { selectAllChallenging, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo"
@@ -57,14 +57,41 @@ export const login = async(email, password) =>{
     }
 }
 
-export const getMyScrap = async(userId) =>{
+export const getMyScrapOverView = async(userId) =>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await selectUserScrapFirst(connection, userId);
+    const result = await selectUserScrapOverView(connection, userId);
+    connection.release()
     return result
 }
 
-export const getNextScrap = async(userId, recipeId) => {
+export const getMyChallengingOverView = async(userId) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectUserChallenging(connection, userId);
+    connection.release()
+    return result
+}
+
+export const getMyCompleteOverView = async(userId) => {
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectUserComplete(connection, userId);
+    connection.release()
+    return result
+}
+
+export const getMyScrapAll = async(userId) => {
     const connection = await pool.getConnection(async conn => conn);
-    const result = await selectUserScrapNext(connection, userId, recipeId)
+    const result = await selectAllScrap(connection, userId);
+    return result
+}
+
+export const getMyChallengingAll = async(userId) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await selectAllChallenging(connection, userId);
+    return result
+}
+
+export const getMyCompleteAll = async(userId) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectAllComplete(connection, userId)
     return result
 }
