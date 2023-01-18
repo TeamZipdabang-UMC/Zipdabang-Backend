@@ -43,14 +43,38 @@ export const selectPassword = async(connection, email) =>{
     return selectResult[0][0]
 }
 
-export const selectUserScrapFirst = async(connection, userId) =>{
-    const selectUserScrapFirstQuery = `select target_recipe from scrap where owner = ${userId} order by created_at DESC LIMIT 3;`
+export const selectUserScrapOverView = async(connection, userId) =>{
+    const selectUserScrapFirstQuery = `select target_recipe from scrap where owner = ${userId} order by created_at DESC LIMIT 2;`
     const selectResult = await connection.query(selectUserScrapFirstQuery);
     return selectResult[0]
 }
 
-export const selectUserScrapNext = async(connection, userId, recipeId) =>{
-    const selectUserScrapNextQuery = `select target_recipe from scrap where owner = ${userId} and created_at < (select created_at from scrap where target_recipe = ${recipeId}) order by created_at DESC LIMIT 3;`
+export const selectUserChallenging = async(connection, userId) =>{
+    const selectUserChallengingQuery = `select target_recipe from challenge where owner = ${userId} and status = 'challenging' order by created_at DESC limit 2;`
+    const selectResult = await connection.query(selectUserChallengingQuery);
+    return selectResult[0]
+}
+
+export const selectUserComplete = async(connection, userId) =>{
+    const selectUserCompleteQuery = `select target_recipe from challenge where owner = ${userId} and status = 'complete' order by  created_at DESC  limit 2;`
+    const selectResult = await connection.query(selectUserCompleteQuery)
+    return selectResult[0]
+}
+
+export const selectAllScrap = async(connection, userId) =>{
+    const selectUserScrapNextQuery = `select target_recipe from scrap where owner = ${userId} order by created_at DESC;`
     const selectResult = await connection.query(selectUserScrapNextQuery)
+    return selectResult[0]
+}
+
+export const selectAllChallenging = async(connection, userId) =>{
+    const selectAllChallengingQuery = `select target_recipe from Challenge where owner = ${userId} and status = 'challenging' order by created_at DESC;`
+    const selectResult = await connection.query(selectAllChallengingQuery);
+    return selectResult[0]
+}
+
+export const selectAllComplete = async(connection, userId) =>{
+    const selectAllCompleteQuery = `select target_recipe from Challenge where owner = ${userId} and status = 'complete' order by  created_at DESC;`
+    const selectResult = await connection.query(selectAllCompleteQuery);
     return selectResult[0]
 }
