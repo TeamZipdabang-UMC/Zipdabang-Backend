@@ -8,7 +8,7 @@ export const selectSingleEmail = async(connection, email) =>{
 }
 
 export const createUserEmail = async(connection, userEmail, userProfile) =>{
-    const createUserEmailQuery = `insert into user(email, profile_url, is_social) values ('${userEmail}', '${userProfile}', true);`
+    const createUserEmailQuery = `insert into user(email, profile_url) values ('${userEmail}', '${userProfile}');`
     const insertResult = await connection.query(createUserEmailQuery)
     return insertResult[0].affectedRows
 }
