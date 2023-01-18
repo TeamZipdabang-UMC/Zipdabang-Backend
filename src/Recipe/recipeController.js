@@ -1,23 +1,36 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID } from "./recipeProvider";
 import { json } from "express";
 
 export const getCategory = async(req,res) =>{
-    const {params:{categoryId}} = req;
-    const getCategoryId = await getCategoryID(categoryId)
-    
-    if(getCategoryId[0]){
-        res.send(JSON.stringify(getCategoryId));
+    const {categoryId, main_page, is_official} = req.body;
+    const responseObj = {
+        status : "category not exist",
     }
-    else{
-        const responseObj = {
-            status : "category not exist",
+    if(main_page==1){
+        const getCategoryId = await getMainCategoryID(categoryId)
+        if(getCategoryId[0]){
+            res.send(JSON.stringify(getCategoryId));
         }
-        res.send(JSON.stringify(responseObj))        
+        else{
+            res.send(JSON.stringify(responseObj))        
+        }
     }
+
+    else{
+        const getCategoryId = await getCategoryID(categoryId, is_official)
+        if(getCategoryId[0]){
+            res.send(JSON.stringify(getCategoryId));
+        }
+        else{
+            res.send(JSON.stringify(responseObj))        
+        }
+    }
+        
 }
+
 
 export const thumbCategory = async(req, res)=>{
     const {params:{categoryId}} = req;
