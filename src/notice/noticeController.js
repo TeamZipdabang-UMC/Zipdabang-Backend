@@ -1,7 +1,9 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { getNoticeList, getNoticeId } from "./noticeProvider";
+import { getNoticeList, getNoticeId, getTosList } from "./noticeProvider";
+import exp from "constants";
+import { json } from "body-parser";
 
 export const noticeList = async(req, res) => {
     const getNotice = await getNoticeList()
@@ -22,4 +24,10 @@ export const selectnotice = async(req, res) => {
         }
         res.send(JSON.stringify(responseObj))
     }
+}
+
+export const getTos = async(req, res) =>{
+    
+    const gettos = await getTosList();
+    res.send(JSON.stringify(gettos));
 }

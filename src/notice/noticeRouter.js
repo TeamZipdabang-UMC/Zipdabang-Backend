@@ -1,9 +1,10 @@
 import  express  from "express";
-import { noticeList, selectnotice } from './noticeController';
+import { noticeList, selectnotice, getTos } from './noticeController';
 
 const noticeRouter = express.Router();
 export default noticeRouter
 
 
 noticeRouter.get('/', noticeList);
-noticeRouter.get('/:noticeId', selectnotice);
+noticeRouter.get('/:noticeId([0-9]+)', selectnotice);
+noticeRouter.get('/tos/', getTos);

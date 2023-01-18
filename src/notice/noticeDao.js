@@ -15,3 +15,12 @@ export const getnoticeId = async(connection, noticeId) =>{
     const getnoticeId = await connection.query(selectNoticeIdQuery, noticeId);
     return getnoticeId[0];
 }
+
+export const getTosLists = async(connection) =>{
+
+    const tosQuery = 
+    `SElECT title, body from tos;`;
+    
+    const result = await connection.query(tosQuery);
+    return result[0];
+}
