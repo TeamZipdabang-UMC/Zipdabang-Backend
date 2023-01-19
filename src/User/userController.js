@@ -1,44 +1,58 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { addUser, finishSocialLogin, kakaoLogin, startWithGoogle, startWithKakao } from "./userService";
+import { addUser, finishSocialLogin, startWithGoogle, startWithKakao } from "./userService";
 import { checkExistNickname, getMyScrap, getNextScrap, login } from "./userProvider";
 
 
-export const startKakaoRedirect = async(req,res)=>{
-    const nextUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&response_type=code`;
-    res.redirect(nextUrl);
-}
+// export const startKakaoRedirect = async(req,res)=>{
+//     const nextUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&response_type=code`;
+//     res.redirect(nextUrl);
+// }
 
-export const finishKakaoRedirect = async(req,res) =>{
-    const {code} = req.query
-    const tokenApiUrl = `https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&code=${code}`;
-    
-    const getFinalTokenApi = await fetch(tokenApiUrl,
-        {
-            method: "POST",
-            headers:{
-                "Content-type": "application/json"
-            }
-        })
-    const kakaoToken = await getFinalTokenApi.json();
+export const kakaoLogin = async(req, res) =>{
+    const {userEmail, userProfile} = req.body
 
-    const getUserApi = `https://kapi.kakao.com/v2/user/me`
-
-    const userData = await fetch(getUserApi,{
-        method : "POST",
-        headers:{
-            "Authorization" : `Bearer ${kakaoToken.access_token}`,
-            "Content-type" : "application/x-www-form-urlencoded;charset=utf-8"
-        }
-    });
-
-    
-    const {kakao_account : {profile : {profile_image_url:userProfile}, email:userEmail },} =  await userData.json();
-
-    const result = await startWithKakao(userProfile, userEmail)
+    const result = await startWithKakao(userEmail, userProfile);
     res.send(JSON.stringify(result))
 }
+
+export const googleLogin = async(req, res) =>{
+    const {userEmail, userProfile} = req.body
+
+    const result = await startWithGoogle(userEmail, userProfile);
+    res.send(JSON.stringify(result))
+}
+
+// export const finishKakaoRedirect = async(req,res) =>{
+//     const {code} = req.query
+//     const tokenApiUrl = `https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=${privateInfo.KAKAO_API_KEY}&redirect_uri=${privateInfo.KAKAO_REDIRECT}&code=${code}`;
+    
+//     const getFinalTokenApi = await fetch(tokenApiUrl,
+//         {
+//             method: "POST",
+//             headers:{
+//                 "Content-type": "application/json"
+//             }
+//         })
+//     const kakaoToken = await getFinalTokenApi.json();
+
+//     const getUserApi = `https://kapi.kakao.com/v2/user/me`
+
+//     const userData = await fetch(getUserApi,{
+//         method : "POST",
+//         headers:{
+//             "Authorization" : `Bearer ${kakaoToken.access_token}`,
+//             "Content-type" : "application/x-www-form-urlencoded;charset=utf-8"
+//         }
+//     });
+
+    
+//     const {kakao_account : {profile : {profile_image_url:userProfile}, email:userEmail },} =  await userData.json();
+
+//     const result = await startWithKakao(userProfile, userEmail)
+//     res.send(JSON.stringify(result))
+// }
 
 export const startGoogleRedirect = async(req, res) =>{
     const nextUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${privateInfo.GOOGLE_CLIENT_ID}&redirect_uri=${privateInfo.GOOGLE_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`;
@@ -79,15 +93,14 @@ export const findExistNickname = async(req,res)=>{
     const result = await checkExistNickname(nickname);
     if (result){
         const responseObj = {
-            status : "exist",
-            isExist : true
+            exist : true,
+            nickname
         }
         res.send(JSON.stringify(responseObj))
     }
     else{
         const responseObj = {
-            status : "not exist",
-            isExist : false
+            exist : false,
         }
         res.send(JSON.stringify(responseObj))
     }
@@ -96,7 +109,6 @@ export const findExistNickname = async(req,res)=>{
 export const postUserDataSocial = async(req,res) =>{
     const {name, nickname, phoneNum, birth, email} = req.body
 
-    console.log(req.body)
     const expressionErrorObj = {
         status : "expression error",
         type : ``
@@ -159,8 +171,10 @@ export const postUserDataSocial = async(req,res) =>{
     if (result)
     {
         const responseObj = {
-            status : "success",
-            info: dataObj
+            success: true,
+            name : dataObj.name,
+            nickname : dataObj.nickname,
+            phoneNum : dataObj.phoneNum
         }
 
         res.send(JSON.stringify(responseObj));
@@ -258,56 +272,56 @@ export const postUser = async(req, res) =>{
     }
 }
 
-export const signIn = async(req, res) =>{
-    const {email, password} = req.body
-    const expressionErrorObj = {
-        status : "expression error",
-        type : ``
-    }
+// export const signIn = async(req, res) =>{
+//     const {email, password} = req.body
+//     const expressionErrorObj = {
+//         status : "expression error",
+//         type : ``
+//     }
 
-    const existErrorObj = {
-        status : "data exist error",
-        type : ``
-    }
+//     const existErrorObj = {
+//         status : "data exist error",
+//         type : ``
+//     }
 
-    if (!email){
-        existErrorObj.type = `email`
-        res.send(JSON.stringify(existErrorObj))
-    }
-    else if (!password){
-        existErrorObj.type = `password`
-        res.send(JSON.stringify(existErrorObj))
-    }
+//     if (!email){
+//         existErrorObj.type = `email`
+//         res.send(JSON.stringify(existErrorObj))
+//     }
+//     else if (!password){
+//         existErrorObj.type = `password`
+//         res.send(JSON.stringify(existErrorObj))
+//     }
 
-    if (!regexEmail.test(email)){
-        expressionErrorObj.type = 'email',
-        res.send(JSON.stringify(expressionErrorObj))
-    }
+//     if (!regexEmail.test(email)){
+//         expressionErrorObj.type = 'email',
+//         res.send(JSON.stringify(expressionErrorObj))
+//     }
 
-    const result = await login(email, password);
-    console.log(result)
-    if (!result.success && result.status == 'email')
-    {
-        const responseObj = {
-            status : "login fail",
-            error : "such user that have email not exist"
-        }
+//     const result = await login(email, password);
+//     console.log(result)
+//     if (!result.success && result.status == 'email')
+//     {
+//         const responseObj = {
+//             status : "login fail",
+//             error : "such user that have email not exist"
+//         }
 
-        res.send(JSON.stringify(responseObj))
-    }
-    else if (!result.success && result.status == 'password'){
-        const responseObj = {
-            status : "login fail",
-            error : "password is wrong"
-        }
+//         res.send(JSON.stringify(responseObj))
+//     }
+//     else if (!result.success && result.status == 'password'){
+//         const responseObj = {
+//             status : "login fail",
+//             error : "password is wrong"
+//         }
 
-        res.send(JSON.stringify(responseObj))
-    }
-    else{
-        const responseObj = result
-        res.send(JSON.stringify(responseObj))
-    }
-}
+//         res.send(JSON.stringify(responseObj))
+//     }
+//     else{
+//         const responseObj = result
+//         res.send(JSON.stringify(responseObj))
+//     }
+// }
 
 export const getMyPageFirst = async(req, res) =>{
     const {userId, userEmail} = req.verifiedToken;

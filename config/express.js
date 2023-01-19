@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import userRouter from "../src/User/userRouter";
-import recipeRouter from "../src/recipes/recipeRouter";
+import recipeRouter from "../src/Recipe/recipeRouter";
 
 const app = express();
 
@@ -11,5 +11,6 @@ app.use(cors());
 
 app.use('/users', userRouter);
 app.use('/recipes', recipeRouter);
+
 
 export default app;
