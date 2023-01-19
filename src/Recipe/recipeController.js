@@ -1,7 +1,7 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword } from "./recipeProvider";
 import { json } from "express";
 
 export const getCategory = async(req,res) =>{
@@ -69,6 +69,23 @@ export const getCategoryPaging = async(req,res) =>{
     else{
         const responseObj = {
             status : "category & id not match",
+        }
+        res.send(JSON.stringify(responseObj))        
+    }
+
+}
+
+export const getSearch = async(req, res)=>{
+    const {keyword} = req.query;
+    console.log(keyword)
+    const result = await searchKeyword(keyword)
+    
+    if(result[0]){
+        res.send(JSON.stringify(result));
+    }
+    else{
+        const responseObj = {
+            status : "keyword not exist",
         }
         res.send(JSON.stringify(responseObj))        
     }

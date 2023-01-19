@@ -10,6 +10,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(cors());
 
 app.use('/users', userRouter);
+app.use('/recipes', recipeRouter);
 
 
 export default app;

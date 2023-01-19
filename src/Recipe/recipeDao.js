@@ -51,3 +51,13 @@ export const getCategoryPagingList = async(connection, categoryId, last) =>{
     const categoryList = await connection.query(selectCategorryQuery, categoryId, last);
     return categoryList[0];
 }
+
+export const searchKeywordList = async(connection, keyword) =>{
+    const searchQuery = 
+    `
+    select id, image_url, name, likes from recipe where name like '${keyword}%';
+    `;
+    console.log(searchQuery);
+    const categoryList = await connection.query(searchQuery, keyword);
+    return categoryList[0];
+}
