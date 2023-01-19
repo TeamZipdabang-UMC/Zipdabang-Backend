@@ -53,11 +53,61 @@ export const getCategoryPagingList = async(connection, categoryId, last) =>{
 }
 
 export const searchKeywordList = async(connection, keyword) =>{
+    //console.log(typeof(keyword))
+
+    //const findString = "라떼";
+    // { 커피 음료 티 에이드 스무디 건강음료 }
+    if(keyword.indexOf("커피") != -1) {
+        const category = " and category = 1";
+    }
+    else if(keyword.indexOf("음료") != -1) {
+        const category = " and category = 2";
+    }
+    else if(keyword.indexOf("티") != -1) {
+        const category = " and category = 3";
+    }
+    else if(keyword.indexOf("에이드") != -1) {
+        const category = " and category = 4";
+    }
+    else if(keyword.indexOf("스무디") != -1) {
+        const category = " and category = 5";
+    }
+    else if(keyword.indexOf("건강음료") != -1) {
+        const category = " and category = 6";
+    }
+
+    
+    const splited = keyword.split(" ");
+    //console.log(splited);
+    //console.log(splited.length);
+    
+    //console.log(text.indexOf(findString))
     const searchQuery = 
     `
-    select id, image_url, name, likes from recipe where name like '${keyword}%';
+    select distinct id, image_url, name, likes from recipe where name like '${splited[0]}%' '${splited[0]}%';
     `;
-    console.log(searchQuery);
-    const categoryList = await connection.query(searchQuery, keyword);
-    return categoryList[0];
+
+    let i=0;
+    //console.log(typeof(i));
+    //console.log(splited[0]);
+    let result = new Array(splited.length);
+    while (i<splited.length) {
+        const searchQuery = 
+        `
+        select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%';
+        `;
+        const categoryList = await connection.query(searchQuery, splited[i]);
+
+
+        
+        console.log(categoryList[0]);
+        //console.log("rr");
+        //console.log(typeof(i))
+        result[i]=categoryList[0];
+        i=i+1;
+        //console.log("check");
+    }
+    //console.log(searchQuery);
+    //const categoryList = await connection.query(searchQuery, );
+    return result;
 }
