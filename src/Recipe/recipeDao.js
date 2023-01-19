@@ -52,11 +52,12 @@ export const getCategoryPagingList = async(connection, categoryId, last) =>{
     return categoryList[0];
 }
 
-export const searchKeywordList = async(connection, keyword) =>{
+export const searchKeywordList = async(connection, keyword, category) =>{
     //console.log(typeof(keyword))
 
     //const findString = "라떼";
     // { 커피 음료 티 에이드 스무디 건강음료 }
+    /*
     if(keyword.indexOf("커피") != -1) {
         const category = " and category = 1";
     }
@@ -75,39 +76,31 @@ export const searchKeywordList = async(connection, keyword) =>{
     else if(keyword.indexOf("건강음료") != -1) {
         const category = " and category = 6";
     }
-
-    
+    */
+   
     const splited = keyword.split(" ");
     //console.log(splited);
     //console.log(splited.length);
     
     //console.log(text.indexOf(findString))
-    const searchQuery = 
-    `
-    select distinct id, image_url, name, likes from recipe where name like '${splited[0]}%' '${splited[0]}%';
-    `;
+    //const searchQuery = 
+    //`
+    //select distinct id, image_url, name, likes from recipe where name like '${splited[0]}%' and category = ${category}';
+    //`;
 
     let i=0;
-    //console.log(typeof(i));
-    //console.log(splited[0]);
+
     let result = new Array(splited.length);
     while (i<splited.length) {
         const searchQuery = 
         `
-        select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%';
+        select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%' and category = '${category}';
         `;
         const categoryList = await connection.query(searchQuery, splited[i]);
-
-
-        
         console.log(categoryList[0]);
-        //console.log("rr");
-        //console.log(typeof(i))
         result[i]=categoryList[0];
         i=i+1;
-        //console.log("check");
+
     }
-    //console.log(searchQuery);
-    //const categoryList = await connection.query(searchQuery, );
     return result;
 }

@@ -78,8 +78,23 @@ export const getCategoryPaging = async(req,res) =>{
 export const getSearch = async(req, res)=>{
     const {keyword} = req.query;
     console.log(keyword)
-    const result = await searchKeyword(keyword)
-    
+
+    const coffeeSearch = await searchKeyword(keyword, 1);
+    const beverageSearch = await searchKeyword(keyword, 2);
+    const teaSearch = await searchKeyword(keyword, 3);
+    const adeSearch = await searchKeyword(keyword, 4);
+    const smoothieSearch = await searchKeyword(keyword, 5);
+    const healthSearch = await searchKeyword(keyword, 6);
+
+    const result = {
+        coffeeSearch : coffeeSearch,
+        beverageSearch : beverageSearch,
+        teaSearch : teaSearch,
+        adeSearch : adeSearch,
+        smoothieSearch : smoothieSearch,
+        healthSearch : healthSearch
+    }
+
     if(result[0]){
         res.send(JSON.stringify(result));
     }

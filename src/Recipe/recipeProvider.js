@@ -29,9 +29,9 @@ export const getCategoryPagingID = async(categoryId, last)=>{
     return result
 }
 
-export const searchKeyword = async(keyword)=>{
+export const searchKeyword = async(keyword, category)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await searchKeywordList(connection, keyword);
+    const result = await searchKeywordList(connection, keyword, category);
     connection.release();
     return result
 }
