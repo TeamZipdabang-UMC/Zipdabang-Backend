@@ -1,6 +1,6 @@
 import { checkExistEmail } from "./userProvider"
 import pool from "../../config/database"
-import { createUserEmail, insertNewUser, insertUserData } from "./userDao";
+import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData } from "./userDao";
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo";
 import bcrypt from "bcrypt"
@@ -161,6 +161,9 @@ export const addUser = async(dataObj) =>{
     return result
 }
 
-export const deleteScraps = async(targets) =>{
-    console.log(targets)
+export const deleteScraps = async(target) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    let deleteSubQuery = target.join(",")
+    deleteSubQuery = '(' + deleteSubQuery + ')'
+    const result = await deleteScrapRow(connection, deleteSubQuery);
 }

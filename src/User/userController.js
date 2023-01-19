@@ -370,9 +370,9 @@ export const getMyComeplete = async(req, res) =>{
 }
 
 export const deleteMyScrap = async(req, res) =>{
-    const targets = req.body
+    const {target} = req.body
     
-    if (targets.lengh == 0 )
+    if (!target)
     {
         const responseObj = {
             success : false,
@@ -380,5 +380,5 @@ export const deleteMyScrap = async(req, res) =>{
         }
         res.send(JSON.stringify(responseObj))
     }
-    const result = await deleteScraps(targets)
+    const result = await deleteScraps(target)
 }
