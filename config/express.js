@@ -2,6 +2,9 @@ import express from "express"
 import cors from "cors"
 import userRouter from "../src/User/userRouter";
 import commentRouter from "../src/Comment/commentRouter";
+import noticeRouter from "../src/notice/noticeRouter";
+import recipeRouter from "../src/Recipe/recipeRouter";
+import rootRouter from "../src/Root/rootRouter";
 
 
 const app = express();
@@ -13,5 +16,8 @@ app.use(cors());
 
 app.use('/users', userRouter);
 app.use('/comments', commentRouter);
+app.use('/root', rootRouter);
+app.use('/recipes', recipeRouter);
+app.use('/notice', noticeRouter);
 
 export default app;
