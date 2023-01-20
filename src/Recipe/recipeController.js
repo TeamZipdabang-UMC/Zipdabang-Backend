@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import { checkTempSave } from "./recipeProvider";
-import { getTempSavedInfo, saveThumbURL, saveStepImgURL, saveRecipe, tempSaveRecipe } from "./recipeService";
+import { getTempSavedInfo, checkTempSave, MyRecipeList, getExtistingInfo, checkRecipeExists, checkUserExists } from "./recipeProvider";
+import { saveThumbURL, saveStepImgURL, saveRecipe, tempSaveRecipe, deleteRecipe, updateRecipe, getSavedInfo, changeChallengeStatus } from "./recipeService";
 
 export const getCreateUserRecipe = async(req,res)=>{
 
@@ -62,6 +62,105 @@ export const postTempSaveUserRecipe = async(req,res)=>{
     await tempSaveRecipe(userId, recipe, category, ingredients, steps);
 
     return res.redirect();//레시피 상세정보 페이지 만들면 추가
+}
+
+
+
+export const getUpdateRecipe = async(req,res)=>{
+    const {userId} = req.verifiedToken;
+    const {recipeId} = req.params;
+
+    const JsonTempInfos = await getExtistingInfo(userId, recipeId);
+
+    return JsonTempInfos;
+}
+
+/*
+ img는 이전에 구현한것처럼 각 사진 등록할때마다 바로 저장.
+ 따라서 업데이트 때는 따로 안 만들어도 됨
+*/
+export const postUpdateRecipe = async(req,res)=>{
+    const {userId} = req.verifiedToken;
+    const {recipe, category, ingredients, steps } = req.body;
+
+    /*미들웨어나 직접 추가로 userId, recipeId 존재 확인 */
+
+    const recipeId = await updateRecipe(userId, recipe, category, ingredients, steps);
+
+    return recipeId;
+}
+
+
+export const getShowRecipeInfo = async(req,res) =>{
+    const {userId} = req.verifiedToken;
+    const {recipeId} = req.params;
+
+    if (await checkRecipeExists(recipeId) == null){
+        return {
+            success : false,
+            error : "데이터베이스에 없습니다"
+           }
+    }
+
+    if (await checkUserExists(userId) == null){
+        return {
+            success : false,
+            error : "데이터베이스에 없습니다"
+           }
+    }
+
+    const JsonRecipeInfos = await getSavedInfo(userId, recipeId);
+
+    //Json에 코멘트 정보 추가
+
+    return JsonRecipeInfos;
+}
+
+export const postStartChallenge = async(req,res)=>{
+    const {userId} = req.verifiedToken;
+    const {recipeId} = req.params;
+    const {challengeStatus} = req.body;
+
+    if (await checkRecipeExists(recipeId) == null){
+        return {
+            success : false,
+            error : "데이터베이스에 없습니다"
+           }
+    }
+
+    if (await checkUserExists(userId) == null){
+        return {
+            success : false,
+            error : "데이터베이스에 없습니다"
+           }
+    }
+
+    await changeChallengeStatus(userId, recipeId, challengeStatus);
+}
+
+export const postDeleteRecipe = async(req,res)=>{
+    const {userId} = req.verifiedToken;
+    const {target} = req.params;
+
+    await deleteRecipe(userId, target);
+}
+
+export const getMyRecipes = async(req,res)=>{
+    const {userId} = req.verifiedToken;
+    const {last} = req.body;
+    //last == 마지막으로 보여진 recipId.
+
+    const list = await MyRecipeList(userId, last);
+
+    if(list == null){
+        return{
+            success : true,
+            message : "생성된 레시피가 없습니다"
+           }
+    }
+    else{
+        return JSON.stringify(list[0]);
+    }
 }
 
 /*

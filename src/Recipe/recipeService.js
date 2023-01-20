@@ -1,55 +1,19 @@
 import pool from "../../config/database"
-import { checkRecipeExists, checkRelatedTablesExist, checkStepExists,
+import { checkRelatedTablesExist, checkStepExists,
     createRecipeForThumb, createStepForImg,
-    deleteTempSavedInfo, getTempSavedInfos,insertTempRecipe,
+    deleteChallengeTable,
+    deleteRecipeDao,
+    deleteTempSavedInfo, insertChallengeTable, insertTempRecipe,
+    updateChallengeTable,
+    updateRecipeDao,
     updateR_InsertCIS, updateStepURL, updateThumbURL } from "./recipeDao";
-import { checkTempSave } from "./recipeProvider";
-
-export const getTempSavedInfo = async(tempSaved, userId)=>{
-    const connection = await pool.getConnection(async conn => conn)
-
-    //넘어온 Temp result 값을 통해 저장된 정보들과 매칭
-    const recipeId = tempSaved.target_recipe;
-
-    const tempInfos= await getTempSavedInfos(connection, recipeId);
-    /*
-        tempInfos[0] : recipe의 모든 정보
-        tempInfos[1] : catery 명
-        tempInfos[2] : 들어가는 ingredient의 모든 정보
-        tempInfos[3] : method의 모든 정보
-    */
-
-    //Json으로 변환해서 보내줍시다~~
-    const JsonTempInfos = await(
-        {
-            userId,
-            /*
-            recipeId : tempInfos[0].Id,
-            is_official : tempInfos[0].is_official,
-            owner : tempInfos[0].owner,
-            time : tempInfos[0].time,
-            recipeName : tempInfos[0].name,
-            recipeIntro : tempInfos[0].intro,
-            thumb : tempInfos[0].image_url,
-            review : tempInfos[0].review,
-            */
-            recipe : tempInfos[0], 
-            category : tempInfos[1],
-            ingredients : tempInfos[2],
-            methods : tempInfos[3]
-        }
-    ).json();
-    
-    connection.release();
-
-    return JsonTempInfos;
-}
+import { checkRecipeExists, checkTempSave } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
 
     const connection = await pool.getConnection(async conn => conn)
 
-    const result = await checkRecipeExists(connection, recipeId);
+    const result = await checkRecipeExists(recipeId);
 
     if(result != null){
         //1. 이미 레시피 id가 있을 때 기존 recipe id에 저장
@@ -113,7 +77,7 @@ const save = async(userId, recipe, category, ingredients, steps, is_tempSave)=>{
     const connection = await pool.getConnection(async conn => conn)
 
     //1. 해당 recipeId가 있는지 확인
-    const recipeId = await checkRecipeExists(connection, recipe.Id);
+    const recipeId = await checkRecipeExists(recipe.Id);
 
     //recipeId가 이미 존재할 때
     if (recipeId != null){
@@ -189,4 +153,95 @@ const checkInsertUpdateTables = async(connection, userId, recipe, category, ingr
         await updateRCIS(connection, userId, recipe, category,ingredients, steps);
     }
 
+}
+
+export const updateRecipe = async(userId, recipe, category, ingredients, steps)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result  = updateRecipeDao(connection,recipe, category, ingredients, steps);
+
+    connection.release();
+
+    if(result != null){
+        return {
+            success : true,
+            recipeId : recipe.id
+           };
+    }
+    else{
+        return {
+            success : false,
+            error : "DB-레시피 수정 실패"
+           }
+    }
+}
+
+export const deleteRecipe = async(userId, target) =>{
+
+    const connection = await pool.getConnection(async conn => conn)
+
+    let deleteSubQuery = target.join(",")
+    deleteSubQuery = '(' + deleteSubQuery + ')'
+
+    const result = await deleteRecipeDao(connection, userId, deleteSubQuery)
+
+    connection.release();
+
+    if (result != null){
+        return {
+            success : true
+           }
+    }
+    else {
+        return {
+            success : false,
+            error : "DB-레시피 삭제 실패"
+           }
+    }
+}
+
+export const getSavedInfo = async(userId, recipeId) =>{
+
+    const connection = await pool.getConnection(async conn => conn)
+
+    //전체 정보 가져오는 Dao 호출
+    //const result = await ; //getTempSavedInfos가 확정되면 거의 그대로 가져오면 됨
+
+    connection.release();
+
+    return result;
+}
+
+export const changeChallengeStatus = async(userId, recipeId, challengeStatus) =>{
+
+    const connection = await pool.getConnection(async conn => conn)
+
+    let result;
+
+    if(challengeStatus == null){ //or ''
+        //challengeStatus -> insert 하면서 challenge로 변경
+        result = await insertChallengeTable(connection, userId, recipeId);
+    }
+    else if(challengeStatus == 'challenge'){
+        //challengeStatus -> update complete
+        result = await updateChallengeTable(connection, userId, recipeId);
+    }
+    else if(challengeStatus == 'complete'){
+        //관련 challenge table 삭제
+        result = await deleteChallengeTable(connection, userId, recipeId);
+    }
+
+    connection.release();
+
+    if(result != null){
+        return {
+            success : true,
+        }
+    }
+    else{
+        return {
+            success : false,
+            error : "DB 실패"
+           }
+    }
 }

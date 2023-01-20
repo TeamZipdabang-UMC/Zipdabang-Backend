@@ -45,8 +45,15 @@ export const getTempSavedInfos = async(connection, recipeId)=>{
     return result;
 }
 
-export const checkRecipeExists = async(connection, recipeId)=>{
+export const checkRecipeExistsDao = async(connection, recipeId)=>{
     const sql = `select id from recipe where id='${recipeId}';`
+    const result = await connection.query(sql);
+
+    return result;
+}
+
+export const checkUserExistsDao = async(connection,userId)=>{
+    const sql = `select owner from recipe where owner='${owner}';`
     const result = await connection.query(sql);
 
     return result;
@@ -60,7 +67,7 @@ export const checkTempSaveExists = async(connection, userId) =>{
 }
 
 export const updateThumbURL = async(connection, recipeId, dest) =>{
-    const sql = `update recipe set img_url = '${dest}', updated_at = current_timestamp where id = '${recipeId}';` //update_at 정보 추가
+    const sql = `update recipe set img_url = '${dest}', updated_at = current_timestamp(6) where id = '${recipeId}';` //update_at 정보 추가
     const result = await connection.query(sql);
     console.log(result, "thumb 업데이트 성공");
 }
@@ -90,7 +97,7 @@ export const checkRelatedTablesExist = async (connection, recipeId) =>{
 
 
 export const updateStepURL = async(connection, stepId, dest) =>{
-    const sql = `update step set img_url = '${dest}', updated_at=current_timestamp where id = '${stepId}';` //update_at 정보 추가
+    const sql = `update step set img_url = '${dest}', updated_at=current_timestamp(6) where id = '${stepId}';` //update_at 정보 추가
     const result = await connection.query(sql);
     console.log(result, "stepImg 업데이트 성공");
 }
@@ -111,4 +118,89 @@ export const updateR_InsertCIS = async(connection, recipe, category,ingredients,
 
 export const insertTempRecipe = async(connection, recipe, category,ingredients)=>{
     //모든 table을 새로 생성해서 저장
+}
+
+export const updateRecipeDao = async (connection,recipe, category, ingredients, steps) =>{
+    let sql = `update recipe as r set r.name = '${recipe.name}', r.intro = '${recipe.intro}', r.time = '${recipe.time}', r.review='${review}',
+    r.category = (select id from beveragecategory as c where c.name = '${category}');`;
+    
+    ingredients.forEach(i =>{
+        sql += `update ingredient as i set i.name='${i.name}', i.quantity='${i.quantity}' where i.id='${i.id}';`;
+    })
+    steps.forEach(s =>{
+        sql += `update step as s set s.description='${s.description}' where s.id='${s.id}';`;
+    })
+
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
+}
+
+export const selectMyRecipes = async (connection, userId)=>{
+    const sql = `select name, img_url, likes from recipe 
+    where recipe.owner = '${userId}'
+    order by created_at desc
+    limit 8;`
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
+}
+
+export const selectMyRecipesPaging = async (connection, userId, last)=>{
+    const sql = `select id, name, img_url, likes from recipe 
+    where recipe.owner = '${userId}' and created_at < (select created_at from recipe where id='${last}')
+    order by created_at desc
+    limit 8;`
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
+}
+
+export const deleteRecipeDao = async(connection, userId, target)=>{
+    const sql = `delete recipe, beveragecategory, ingredient, step from recipe
+    inner join ingredient inner join step on recipe.id = ingredient.target_recipe = step.target_recipe
+    inner join beveragecategory on recipe.category = beveragecategory.id
+    where recipe.id in ${target} and recipe.owner = '${userId}';`
+
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
+}
+
+export const insertChallengeTable = async(connection, userId, recipeId)=>{
+    const sql = `insert into challenge (owner, target_recipe, status) value('${userId}', '${recipeId}', 'challenge');`
+
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
+}
+
+export const updateChallengeTable = async(connection, userId, recipeId)=>{
+    const sql = `update challenge as c set c.status='complete' where c.owner='${userId}' and c.target_recipe='${recipeId}';`
+
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
+}
+
+export const deleteChallengeTable = async(connection, userId, recipeId)=>{
+    const sql = `delete from challenge where owner='${userId}' and target_recipe='${recipeId}';`
+
+    const result = await connection.query(sql);
+
+    console.log(result);
+
+    return result;
 }
