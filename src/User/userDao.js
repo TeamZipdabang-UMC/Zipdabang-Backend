@@ -78,3 +78,10 @@ export const selectAllComplete = async(connection, userId) =>{
     const selectResult = await connection.query(selectAllCompleteQuery);
     return selectResult[0]
 }
+
+
+export const deleteScrapRow = async(connection, deleteSubQuery) =>{
+    const deleteQuery = `delete from scrap where target_recipe in ` + deleteSubQuery + ';'
+    const deleteResult = await connection.query(deleteQuery);
+    console.log(deleteResult)
+}

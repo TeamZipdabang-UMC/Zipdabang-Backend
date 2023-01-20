@@ -4,8 +4,6 @@ import { deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, get
 
 const userRouter = express.Router();
 
-export default userRouter
-
 // userRouter.get('/kakao/start', startKakaoRedirect);
 // userRouter.get('/kakao/finish', finishKakaoRedirect);
 userRouter.post('/kakao/login', kakaoLogin);
@@ -22,3 +20,6 @@ userRouter.get('/:id([0-9]+)/my-scrap', jwtMiddleware,getMyScrap)
 userRouter.get('/:id([0-9]+)/my-challenging', jwtMiddleware, getMyChallenging)
 userRouter.get('/:id([0-9]+)/my-complete', jwtMiddleware, getMyComeplete)
 userRouter.delete('/:id([0-9]+)/my-scrap/delete', jwtMiddleware, deleteMyScrap)
+
+
+export default userRouter
