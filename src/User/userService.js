@@ -1,6 +1,6 @@
 import { checkExistEmail } from "./userProvider"
 import pool from "../../config/database"
-import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData, updateNickname } from "./userDao";
+import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData, updateInactive, updateNickname } from "./userDao";
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo";
 import bcrypt from "bcrypt"
@@ -156,3 +156,10 @@ export const changeNickname = async(userId, nickname) =>{
     const updateResult = await updateNickname(connection, userId, nickname)
     return updateResult
 } 
+
+export const quitUser = async(userId) =>{
+    console.log("in service", userId)
+    const connection = await pool.getConnection(async conn => conn)
+    const patchResult = await updateInactive(connection, userId)
+    return patchResult
+}
