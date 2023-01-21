@@ -1,8 +1,8 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { addUser, deleteScraps, finishSocialLogin, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap } from "./userProvider";
+import { addUser, changeNickname, deleteScraps, finishSocialLogin, startWithGoogle, startWithKakao } from "./userService";
+import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap } from "./userProvider";
 
 
 export const kakaoLogin = async(req, res) =>{
@@ -29,12 +29,14 @@ export const findExistNickname = async(req,res)=>{
             exist : true,
             nickname
         }
+        console.log(responseObj)
         res.send(JSON.stringify(responseObj))
     }
     else{
         const responseObj = {
             exist : false,
         }
+        console.log(responseObj)
         res.send(JSON.stringify(responseObj))
     }
 }
@@ -55,48 +57,48 @@ export const postUserDataSocial = async(req,res) =>{
     if (!name)
     {
         existErrorObj.type = `name`
-        res.send(JSON.stringify(existErrorObj))
+        return res.status(400).send(JSON.stringify(existErrorObj))
     }
     else if (!nickname){
         existErrorObj.type = `nickname`
-        res.send(JSON.stringify(existErrorObj))
+        return res.status(400).send(JSON.stringify(existErrorObj))
     }
     else if (!phoneNum){
         existErrorObj.type = `phoneNum`
-        res.send(JSON.stringify(existErrorObj))
+        return res.status(400).send(JSON.stringify(existErrorObj))
     }
     else if (!birth){
         existErrorObj.type = `birth`
-        res.send(JSON.stringify(existErrorObj))
+        return res.status(400).send(JSON.stringify(existErrorObj))
     }
     else if (!email){
         existErrorObj.type = `email`
-        res.send(JSON.stringify(existErrorObj))
+        return res.status(400).send(JSON.stringify(existErrorObj))
     }
 
     if (!regexEmail.test(email))
     {
         expressionErrorObj.type = `email`
-        res.send(JSON.stringify(expressionErrorObj))
+        return res.status(400).send(JSON.stringify(expressionErrorObj))
     }
     else if (name.length <= 0 || name.length > 10)
     {
         expressionErrorObj.type = `name`
-        res.send(JSON.stringify(expressionErrorObj))
+        return res.status(400).send(JSON.stringify(expressionErrorObj))
     }
     else if (nickname.length <= 1 || nickname.length > 10)
     {
         expressionErrorObj.type = `nickname`
-        res.send(JSON.stringify(expressionErrorObj))
+        return res.status(400).send(JSON.stringify(expressionErrorObj))
     }
     else if (phoneNum.length != 11)
     {
         expressionErrorObj.type = `phone number`
-        res.send(JSON.stringify(expressionErrorObj))
+        return res.status(400).send(JSON.stringify(expressionErrorObj))
     }
     else if (birth.length != 8 || birth[6] != '-'){
         expressionErrorObj.type = `birth`
-        res.send(JSON.stringify(expressionErrorObj))
+        return res.status(400).send(JSON.stringify(expressionErrorObj))
     }
 
     const dataObj = req.body
@@ -110,7 +112,8 @@ export const postUserDataSocial = async(req,res) =>{
             phoneNum : dataObj.phoneNum
         }
 
-        res.send(JSON.stringify(responseObj));
+        console.log(responseObj)
+        return res.send(JSON.stringify(responseObj));
     }
 }
 
@@ -127,6 +130,7 @@ export const getMyPage = async(req, res) =>{
         myCompleteOverView : myCompleteResponse
     }
 
+    console.log(myPageResponse)
     res.send(JSON.stringify(myPageResponse))
 }
 
@@ -137,6 +141,7 @@ export const getMyScrap = async(req, res) =>{
     const response = {
         myScrap : myAllScrap
     }
+    console.log(response)
     res.send(JSON.stringify(response))
 }
 
@@ -147,29 +152,84 @@ export const getMyChallenging = async(req, res) => {
     const response = {
         myChallenging : myAllChallenging
     }
+    console.log(response)
     res.send(JSON.stringify(response))
 }
 
 export const getMyComeplete = async(req, res) =>{
     const {userId, userEmail} = req.verifiedToken
-    const myAllComplete = await getMyChallengingAll(userId)
+    const myAllComplete = await getMyCompleteAll(userId)
 
     const response = {
-        myChallenging : myAllComplete
+        myComplete : myAllComplete
     }
+    console.log(response)
     res.send(JSON.stringify(response))
 }
 
 export const deleteMyScrap = async(req, res) =>{
     const {target} = req.body
-    
-    if (!target)
+    const {userId} = req.verifiedToken
+    if (!target || target.length == 0)
     {
         const responseObj = {
             success : false,
             error : "삭제할 레시피들의 아이디를 보내주세요"
         }
-        res.send(JSON.stringify(responseObj))
+
+        console.log(responseObj)
+        return res.status(400).send(JSON.stringify(responseObj))
     }
-    const result = await deleteScraps(target)
+    const result = await deleteScraps(target,userId)
+    if (result > 0){
+        const responseObj = {
+            success : true,
+        }
+        console.log(responseObj)
+       return res.send(JSON.stringify(responseObj))
+    }
+    else{
+        const responseObj = {
+            success : false,
+            error : "삭제할 레시피가 데이터베이스에 없습니다"
+        }
+       return res.status(400).send(JSON.stringify(responseObj))
+    }
+}
+
+export const patchNickname = async(req, res) =>{
+    const {nickname} = req.body
+    const {userId} = req.verifiedToken
+
+    const errorResponseObj = {
+        success : false,
+        error : ``
+    }
+
+    if(!nickname){
+        errorResponseObj.error = '닉네임을 보내주세요'
+        return res.status(400).send(JSON.stringify(errorResponseObj))
+    }
+    else if (nickname.length < 2 || nickname.length >= 10){
+        errorResponseObj.error = '닉네임은 2 ~ 10글자로 해주세요'
+        return res.status(400).send(JSON.stringify(errorResponseObj))
+    }
+
+    const nicknameCheck = await checkExistNickname(nickname)
+    if (nicknameCheck){
+        errorResponseObj.error = '닉네임이 이미 누가 사용중입니다'
+        return res.status(400).send(JSON.stringify(errorResponseObj))
+    }
+    else{
+        const changeResult = await changeNickname(userId,nickname)
+        if (changeResult > 0){
+            const responseObj = {
+                success : true,
+                error : null
+            }
+
+            console.log(responseObj)
+            return res.status(200).send(JSON.stringify(responseObj))
+        }
+    }
 }
