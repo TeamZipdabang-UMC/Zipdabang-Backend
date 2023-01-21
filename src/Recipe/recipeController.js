@@ -1,22 +1,7 @@
 import fetch from "node-fetch";
-import { getTempSavedInfo, checkTempSave, MyRecipeList, getExtistingInfo, checkRecipeExists, checkUserExists } from "./recipeProvider";
-import { saveThumbURL, saveStepImgURL, saveRecipe, tempSaveRecipe, deleteRecipe, updateRecipe, getSavedInfo, changeChallengeStatus } from "./recipeService";
+import { MyRecipeList, getExtistingInfo, checkRecipeExists, checkUserExists } from "./recipeProvider";
+import { saveThumbURL, saveStepImgURL, deleteRecipe, updateRecipe, getSavedInfo, changeChallengeStatus, addLikeToRecipe, ScrapRecipe } from "./recipeService";
 
-export const getCreateUserRecipe = async(req,res)=>{
-
-    const {userId} = req.verifiedToken;
-
-    //임시저장 여부 체크
-    const result = await checkTempSave(userId);
-    
-    if (result == null){
-        return res.render(/*사용자 레시피 생성 페이지 */);
-    } else{
-        const JsonTempInfos = await getTempSavedInfo(result, userId);
-
-        return res.render(/*사용자 레시피 생성 페이지 ,*/ JsonTempInfos);
-    }
-}
 
 export const saveImgURL = async(req,res)=>{
     const {userId} = req.verifiedToken;
@@ -40,29 +25,7 @@ export const saveImgURL = async(req,res)=>{
     }
 }
 
-export const postCreateUserRecipe = async(req,res)=>{
-    const {userId} = req.verifiedToken;
 
-    const {/*recipeId, is_official, owner, time, recipeName, recipeIntro, review,*/
-        recipe, category, ingredients, steps } = req.body;
-
-    await saveRecipe(userId, recipe, category, ingredients, steps);
-
-    return res.redirect();//레시피 상세정보 페이지 만들면 추가
-
-}
-
-//update랑 거의 똑같은 동작일 듯?
-export const postTempSaveUserRecipe = async(req,res)=>{
-    const {userId} = req.verifiedToken;
-
-    const {/*recipeId, is_official, owner, time, recipeName, recipeIntro, review,*/
-        recipe, category, ingredients, steps } = req.body;
-
-    await tempSaveRecipe(userId, recipe, category, ingredients, steps);
-
-    return res.redirect();//레시피 상세정보 페이지 만들면 추가
-}
 
 
 
@@ -136,6 +99,33 @@ export const postStartChallenge = async(req,res)=>{
     }
 
     await changeChallengeStatus(userId, recipeId, challengeStatus);
+}
+
+export const postLike = async(req,res)=>{
+    const {recipeId} = req.params;
+
+    if (await checkRecipeExists(recipeId) == null){
+        return {
+            success : false,
+            error : "데이터베이스에 없습니다"
+           }
+    }
+
+    await addLikeToRecipe(recipeId);
+}
+
+export const postScrap = async(req,res)=>{
+    const {userId} = req.verifiedToken;
+    const {recipeId} = req.params;
+
+    if (await checkRecipeExists(recipeId) == null){
+        return {
+            success : false,
+            error : "데이터베이스에 없습니다"
+           }
+    }
+
+    await ScrapRecipe(userId, recipeId);
 }
 
 export const postDeleteRecipe = async(req,res)=>{

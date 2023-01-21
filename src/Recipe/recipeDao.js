@@ -4,12 +4,8 @@ export const deleteTempSavedInfo = async(connection, tempSavedId)=>{
 
     return "기존 임시저장 정보 삭제";
 }
-
+/*
 export const getTempSavedInfos = async(connection, recipeId)=>{
-    /*
-    조인으로 만들까 생각하다가 내가 원하는 방식으로 result에 예쁘게 담기는 그림이 안나와서 일단 이렇게 노가다로 진행
-    혹시 좋은 아이디어 있으면 추천 부탁
-    */
 
     const result = [[],[],[],[]];
     //각 정보를 result에 담기
@@ -44,7 +40,7 @@ export const getTempSavedInfos = async(connection, recipeId)=>{
 
     return result;
 }
-
+*/
 export const checkRecipeExistsDao = async(connection, recipeId)=>{
     const sql = `select id from recipe where id='${recipeId}';`
     const result = await connection.query(sql);
@@ -82,14 +78,6 @@ export const createRecipeForThumb = async(connection, userId, dest)=>{
 
 export const checkStepExists = async(connection, recipeId,step)=>{
     const sql = `select id from step where target_recipe='${recipeId}' and step='${step};`
-    const result = await connection.query(sql);
-
-    return result;
-}
-
-export const checkRelatedTablesExist = async (connection, recipeId) =>{
-    const sql = `select r.category as categoryId, i.id as ingredientId, s.id as stepId from recipe as r
-    inner join ingredient as i inner join step as s on r.id = i.target_recipe = s.target=recipe where r.id = '${recipeId}';`
     const result = await connection.query(sql);
 
     return result;
@@ -201,6 +189,22 @@ export const deleteChallengeTable = async(connection, userId, recipeId)=>{
     const result = await connection.query(sql);
 
     console.log(result);
+
+    return result;
+}
+
+export const updateLikes = async(connection, recipeId)=>{
+    const sql = `update recipe set likes= likes+1 where id = '${recipeId}';`;
+
+    const result = await connection.query(sql);
+
+    return result;
+}
+
+export const insertScrap = async(connection, userId,recipeId) =>{
+    const sql = `insert into scrap (owner, target_recipe) value('${userId}', '${recipeId}');`;
+
+    const result = await connection.query(sql);
 
     return result;
 }

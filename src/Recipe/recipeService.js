@@ -1,12 +1,13 @@
 import pool from "../../config/database"
-import { checkRelatedTablesExist, checkStepExists,
+import { checkStepExists,
     createRecipeForThumb, createStepForImg,
     deleteChallengeTable,
     deleteRecipeDao,
-    deleteTempSavedInfo, insertChallengeTable, insertTempRecipe,
+    insertChallengeTable, insertScrap,
     updateChallengeTable,
+    updateLikes,
     updateRecipeDao,
-    updateR_InsertCIS, updateStepURL, updateThumbURL } from "./recipeDao";
+    updateStepURL, updateThumbURL } from "./recipeDao";
 import { checkRecipeExists, checkTempSave } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
@@ -63,97 +64,7 @@ export const saveStepImgURL = async(recipeId, step, dest)=>{
     }
 }
 
-export const saveRecipe = async(userId, recipe, category, ingredients, steps) =>{
-    await save(userId, recipe, category, ingredients, steps, false);
-}
 
-export const tempSaveRecipe = async(userId, recipe, category, ingredients, steps) =>{
-    // userId 하나당 임시저장은 하나까지만 가능함!
-    await save(userId, recipe, category, ingredients, steps, true);
-}
-
-const save = async(userId, recipe, category, ingredients, steps, is_tempSave)=>{
-
-    const connection = await pool.getConnection(async conn => conn)
-
-    //1. 해당 recipeId가 있는지 확인
-    const recipeId = await checkRecipeExists(recipe.Id);
-
-    //recipeId가 이미 존재할 때
-    if (recipeId != null){
-
-        await checkInsertUpdateTables(connection, userId, recipe, category, ingredients, steps)
-
-        //2. 임시저장인지 확인
-        const tempSavedInfo = await checkTempSave(userId);
-
-        if(tempSavedInfo != null && tempSavedInfo.target_recipe == recipe.id){
-            //임시저장된 내용이 있음
-
-            //일반 저장 시 기존 임시저장 정보 삭제
-            if(!is_tempSave)
-                await deleteTempSavedInfo(connection, tempSaved.id); 
-            }
-
-        else if (tempSavedInfo != null && tempSavedInfo.target_recipe != recipe.id){
-            //지금 작성한 내용과 별개로 임시저장 레시피가 있음
-            if(is_tempSave)
-            {
-                //3. 만약 임시저장 페이지가 존재하는데, 새로 임시저장을 원하면 기존 임시저장 테이블을 삭제하고
-                //새로운 레시피를 임시저장 테이블에 등록
-                await deleteTempSavedInfo(connection, tempSaved.id);
-            }
-        }
-    }
-    //recipeId가 없을 때
-    else{
-            if(is_tempSave)
-                //4. 아무것도 거리낄 것이 없는 임시저장
-                await insertTempRecipe(connection, recipe, category,ingredients);
-            //그냥 저장을 하려면, 사진이 꼭 생성되어야 하기 때문에 recipeId가 있을 수 밖에 없음.
-            //따라서 임시저장의 경우만 고려함.
-    }
-
-    connection.release();
-
-    return; //레시피Id
-}
-
-const checkInsertUpdateTables = async(connection, userId, recipe, category, ingredients, steps)=>{
-    const checkResult = await checkRelatedTablesExist(connection, recipe.id);
-
-    let check;
-
-    if(checkResult == null){
-        await updateR_InsertCIS(connection, userId, recipe, category,ingredients, steps);
-    }
-    else {
-        check = checkResult[0][0];
-    }
-
-    if(check.categoryId != null && check.ingredientId == null && check.stepId == null){
-        await updateRC_InsertIS(connection, userId, recipe, category,ingredients, steps);
-    }
-    else if(check.categoryId == null && check.ingredientId != null && check.stepId == null){
-        await updateRI_InsertCS(connection, userId, recipe, category,ingredients, steps);
-    }
-    else if(check.categoryId == null && check.ingredientId == null && check.stepId != null){
-        await updateRS_InsertIS(connection, userId, recipe, category,ingredients, steps);
-    }
-    else if(check.categoryId != null && check.ingredientId != null && check.stepId == null){
-        await updateRCI_InsertS(connection, userId, recipe, category,ingredients, steps);
-    }
-    else if(check.categoryId != null && check.ingredientId == null && check.stepId != null){
-        await updateRCS_InsertI(connection, userId, recipe, category,ingredients, steps);
-    }
-    else if(check.categoryId == null && check.ingredientId != null && check.stepId != null){
-        await updateRIS_InsertC(connection, userId, recipe, category,ingredients, steps);
-    }
-    else if(check.categoryId != null && check.ingredientId != null && check.stepId != null){
-        await updateRCIS(connection, userId, recipe, category,ingredients, steps);
-    }
-
-}
 
 export const updateRecipe = async(userId, recipe, category, ingredients, steps)=>{
     const connection = await pool.getConnection(async conn => conn)
@@ -230,6 +141,46 @@ export const changeChallengeStatus = async(userId, recipeId, challengeStatus) =>
         //관련 challenge table 삭제
         result = await deleteChallengeTable(connection, userId, recipeId);
     }
+
+    connection.release();
+
+    if(result != null){
+        return {
+            success : true,
+        }
+    }
+    else{
+        return {
+            success : false,
+            error : "DB 실패"
+           }
+    }
+}
+
+export const addLikeToRecipe = async(recipeId)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result = await updateLikes(connection, recipeId);
+
+    connection.release();
+
+    if(result != null){
+        return {
+            success : true,
+        }
+    }
+    else{
+        return {
+            success : false,
+            error : "DB 실패"
+           }
+    }
+}
+
+export const ScrapRecipe = async(userId, recipeId)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result = await insertScrap(connection, userId,recipeId);
 
     connection.release();
 

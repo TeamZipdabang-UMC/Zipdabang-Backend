@@ -5,7 +5,9 @@ import { postDeleteRecipe, getCreateUserRecipe, getShowRecipeInfo, postStartChal
     /*getCreateOfficialRecipe, postCreateOfficialRecipe,*/ saveImgURL, 
     getMyRecipes,
     getUpdateRecipe,
-    postUpdateRecipe} from "./recipeController.js";
+    postUpdateRecipe,
+    postLike,
+    postScrap} from "./recipeController.js";
 
 const recipeRouter = express.Router();
 
@@ -16,6 +18,7 @@ recipeRouter.route("/create/user-recipe")
 
 recipeRouter.route("/create/user-recipe/temp-save")
 .all(jwtMiddleware)
+.get(getTempSaveUserRecipe)
 .post(postTempSaveUserRecipe);
 
 recipeRouter.route("/create/save-img/:recipeId([0-9]+)")
@@ -28,6 +31,14 @@ recipeRouter.route("/:recipeId([0-9]+)/info")
 recipeRouter.route("/:recipeId([0-9]+)/challenge")
 .all(jwtMiddleware)
 .post(postStartChallenge)
+
+recipeRouter.route("/:recipeId([0-9]+)/like")
+.all(jwtMiddleware)
+.post(postLike)
+
+recipeRouter.route("/:recipeId([0-9]+)/scrap")
+.all(jwtMiddleware)
+.post(postScrap)
 
 recipeRouter.route("/:recipeId([0-9]+)/delete")
 .all(jwtMiddleware)
