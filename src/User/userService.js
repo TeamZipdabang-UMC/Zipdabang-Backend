@@ -31,6 +31,7 @@ export const startWithKakao = async(userEmail, userProfile)=>{
             
             const responseObj = {
                 status : "join",
+                email : userEmail,
                 token
             }
             return responseObj
@@ -51,6 +52,7 @@ export const startWithKakao = async(userEmail, userProfile)=>{
 
         const responseObj = {
             status : "login",
+            email : userEmail,
             token
         }
         return responseObj
@@ -81,6 +83,7 @@ export const startWithGoogle = async(userEmail, userProfile) => {
 
             const responseObj = {
                 status : "join",
+                email : userEmail,
                 token
             }
             return responseObj;
@@ -99,6 +102,7 @@ export const startWithGoogle = async(userEmail, userProfile) => {
 
         const responseObj = {
             status : "login",
+            email : userEmail,
             token
         }
         return responseObj;
@@ -134,32 +138,6 @@ export const finishSocialLogin = async(dataObj) =>{
     return result
 }
 
-export const addUser = async(dataObj) =>{
-    const connection = await pool.getConnection(async conn => conn)
-
-    const {email, name, nickname, birth, password, phoneNum} = dataObj
-    const now = new Date()
-
-    let nowYear = now.getFullYear() % 100
-    
-    const userYear = Number(dataObj.birth.substr(0,2))
-
-    if (nowYear < userYear)
-        nowYear += 100
-    
-    const userAge = nowYear - userYear + 1
-    
-    const genderNum = Number(dataObj.birth[7])
-
-    const userGender = genderNum % 2 == 0 ? 2 : 1
-
-    const hashedPass = await bcrypt.hash(password,8);
-
-    const dataParam = [name, email, phoneNum, userAge, nickname, hashedPass, userGender]
-    
-    const result = await insertNewUser(connection, dataParam);
-    return result
-}
 
 export const deleteScraps = async(target) =>{
     const connection = await pool.getConnection(async conn => conn)
