@@ -5,10 +5,12 @@ import commentRouter from "../src/Comment/commentRouter";
 import noticeRouter from "../src/notice/noticeRouter";
 import recipeRouter from "../src/Recipe/recipeRouter";
 import rootRouter from "../src/Root/rootRouter";
-
+import morgan from "morgan";
 
 const app = express();
+const logger = morgan("dev")
 
+app.use(logger)
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
