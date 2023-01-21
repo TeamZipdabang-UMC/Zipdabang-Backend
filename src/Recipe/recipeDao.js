@@ -79,17 +79,8 @@ export const searchKeywordList = async(connection, keyword, category) =>{
     */
    
     const splited = keyword.split(" ");
-    //console.log(splited);
-    //console.log(splited.length);
-    
-    //console.log(text.indexOf(findString))
-    //const searchQuery = 
-    //`
-    //select distinct id, image_url, name, likes from recipe where name like '${splited[0]}%' and category = ${category}';
-    //`;
 
     let i=0;
-
     let result = new Array(splited.length);
     while (i<splited.length) {
         const searchQuery = 
