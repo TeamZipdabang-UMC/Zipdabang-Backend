@@ -1,16 +1,17 @@
 import { checkExistEmail } from "./userProvider"
 import pool from "../../config/database"
-import { createUserEmail, insertNewUser, insertUserData } from "./userDao";
+import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData, updateInactive, updateNickname } from "./userDao";
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo";
 import bcrypt from "bcrypt"
 
 
 
-export const startWithKakao = async(userProfile, userEmail)=>{
+export const startWithKakao = async(userEmail, userProfile)=>{
 
     const isLogin = await checkExistEmail(userEmail)
 
+    console.log("isLogin" , isLogin)
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
@@ -30,6 +31,7 @@ export const startWithKakao = async(userProfile, userEmail)=>{
             
             const responseObj = {
                 status : "join",
+                email : userEmail,
                 token
             }
             return responseObj
@@ -50,13 +52,14 @@ export const startWithKakao = async(userProfile, userEmail)=>{
 
         const responseObj = {
             status : "login",
+            email : userEmail,
             token
         }
         return responseObj
     }
 }
 
-export const startWithGoogle = async(userProfile, userEmail) => {
+export const startWithGoogle = async(userEmail, userProfile) => {
     
     const isLogin = await checkExistEmail(userEmail)
 
@@ -80,6 +83,7 @@ export const startWithGoogle = async(userProfile, userEmail) => {
 
             const responseObj = {
                 status : "join",
+                email : userEmail,
                 token
             }
             return responseObj;
@@ -98,6 +102,7 @@ export const startWithGoogle = async(userProfile, userEmail) => {
 
         const responseObj = {
             status : "login",
+            email : userEmail,
             token
         }
         return responseObj;
@@ -106,6 +111,8 @@ export const startWithGoogle = async(userProfile, userEmail) => {
 
 export const finishSocialLogin = async(dataObj) =>{
     // 존재성 여부는 할 필요가 없다
+
+    console.log("in service", "dataObj : ", dataObj)
 
     const connection = await pool.getConnection(async conn => conn);
 
@@ -133,30 +140,26 @@ export const finishSocialLogin = async(dataObj) =>{
     return result
 }
 
-export const addUser = async(dataObj) =>{
+
+export const deleteScraps = async(target,userId) =>{
+    console.log("in service", target, userId)
     const connection = await pool.getConnection(async conn => conn)
-
-    const {email, name, nickname, birth, password, phoneNum} = dataObj
-    const now = new Date()
-
-    let nowYear = now.getFullYear() % 100
-    
-    const userYear = Number(dataObj.birth.substr(0,2))
-
-    if (nowYear < userYear)
-        nowYear += 100
-    
-    const userAge = nowYear - userYear + 1
-    
-    const genderNum = Number(dataObj.birth[7])
-
-    const userGender = genderNum % 2 == 0 ? 2 : 1
-
-    const hashedPass = await bcrypt.hash(password,8);
-
-    const dataParam = [name, email, phoneNum, userAge, nickname, hashedPass, userGender]
-    
-    const result = await insertNewUser(connection, dataParam);
+    let deleteSubQuery = target.join(",")
+    deleteSubQuery = '(' + deleteSubQuery + ')'
+    const result = await deleteScrapRow(connection, deleteSubQuery,userId);
     return result
 }
 
+export const changeNickname = async(userId, nickname) =>{
+    console.log("in service", userId, nickname)
+    const connection = await pool.getConnection(async conn => conn)
+    const updateResult = await updateNickname(connection, userId, nickname)
+    return updateResult
+} 
+
+export const quitUser = async(userId) =>{
+    console.log("in service", userId)
+    const connection = await pool.getConnection(async conn => conn)
+    const patchResult = await updateInactive(connection, userId)
+    return patchResult
+}
