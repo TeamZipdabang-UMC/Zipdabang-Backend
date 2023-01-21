@@ -1,7 +1,7 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { addUser, changeNickname, deleteScraps, finishSocialLogin, startWithGoogle, startWithKakao } from "./userService";
+import { addUser, changeNickname, deleteScraps, finishSocialLogin, quitUser, startWithGoogle, startWithKakao } from "./userService";
 import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap } from "./userProvider";
 
 
@@ -231,5 +231,21 @@ export const patchNickname = async(req, res) =>{
             console.log(responseObj)
             return res.status(200).send(JSON.stringify(responseObj))
         }
+    }
+}
+
+export const patchUser = async(req, res) =>{
+    const {userId} = req.verifiedToken
+    console.log("in controller", userId)
+
+    const result = await quitUser(userId)
+
+    if (result > 0){
+        const responseObj = {
+            success : true
+        }
+
+        console.log(responseObj)
+        return res.send(JSON.stringify(responseObj))
     }
 }

@@ -1,6 +1,6 @@
 import express from 'express'
 import { jwtMiddleware } from '../../config/jwtMiddleware';
-import { deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  googleLogin, kakaoLogin,  patchNickname,  postUserDataSocial } from './userController';
+import { deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  googleLogin, kakaoLogin,  patchNickname,  patchUser,  postUserDataSocial } from './userController';
 
 const userRouter = express.Router();
 
@@ -26,5 +26,7 @@ userRouter.delete('/my-page/my-scrap/delete', jwtMiddleware, deleteMyScrap)
 //닉네임 변경
 userRouter.patch('/my-page/new-nickname',jwtMiddleware,patchNickname)
 
+//회원탈퇴
+userRouter.patch('/my-page/quit',jwtMiddleware,patchUser)
 
 export default userRouter
