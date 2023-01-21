@@ -15,73 +15,93 @@ export const createUserEmail = async(connection, userEmail, userProfile) =>{
 
 export const selectUserByNickname = async(connection, nickname) =>{
     const selectUserNicknameQuery = `select Id from user where nickname = '${nickname}'`;
+    console.log(selectUserNicknameQuery)
     const selectResult = await connection.query(selectUserNicknameQuery)
     return selectResult[0][0];
 }
 
 export const insertUserData = async(connection, dataParma, email) =>{
     const insertUserDataQuery = `update user set name = ?, phone_num = ?, age = ?, nickname = ?, gender = ? where email = '${email}'`
+    console.log(insertUserDataQuery)
     const insertResult = await connection.query(insertUserDataQuery, dataParma)
     return insertResult
 }
 
 export const insertNewUser = async(connection, dataParam) =>{
     const insertUserQuery = `insert into user(name, email, phone_num, age, nickname, password,is_social,gender) values (?,?,?,?,?,?,0,?);`
+    console.log(insertUserQuery)
     const insertResult = await connection.query(insertUserQuery, dataParam);
     return insertResult[0].affectedRows
 }
 
 export const selectByEmail = async(connection, email) =>{
     const selectQuery = `select Id from user where email = '${email}'`;
+    console.log(selectQuery)
     const selectResult = await connection.query(selectQuery)
     return selectResult[0][0]
 }
 
 export const selectPassword = async(connection, email) =>{
     const selectPasswordQuery = `select Id, password from user where email = '${email}';`
+    console.log(selectPasswordQuery)
     const selectResult = await connection.query(selectPasswordQuery);
     return selectResult[0][0]
 }
 
 export const selectUserScrapOverView = async(connection, userId) =>{
     const selectUserScrapFirstQuery = `select target_recipe from scrap where owner = ${userId} order by created_at DESC LIMIT 2;`
+    console.log(selectUserScrapFirstQuery)
     const selectResult = await connection.query(selectUserScrapFirstQuery);
     return selectResult[0]
 }
 
 export const selectUserChallenging = async(connection, userId) =>{
     const selectUserChallengingQuery = `select target_recipe from challenge where owner = ${userId} and status = 'challenging' order by created_at DESC limit 2;`
+    console.log(selectUserChallengingQuery)
     const selectResult = await connection.query(selectUserChallengingQuery);
     return selectResult[0]
 }
 
 export const selectUserComplete = async(connection, userId) =>{
     const selectUserCompleteQuery = `select target_recipe from challenge where owner = ${userId} and status = 'complete' order by  created_at DESC  limit 2;`
+    console.log(selectUserCompleteQuery)
     const selectResult = await connection.query(selectUserCompleteQuery)
     return selectResult[0]
 }
 
 export const selectAllScrap = async(connection, userId) =>{
     const selectUserScrapNextQuery = `select target_recipe from scrap where owner = ${userId} order by created_at DESC;`
+    console.log(selectUserScrapNextQuery)
     const selectResult = await connection.query(selectUserScrapNextQuery)
     return selectResult[0]
 }
 
 export const selectAllChallenging = async(connection, userId) =>{
     const selectAllChallengingQuery = `select target_recipe from Challenge where owner = ${userId} and status = 'challenging' order by created_at DESC;`
+    console.log(selectAllChallengingQuery)
     const selectResult = await connection.query(selectAllChallengingQuery);
     return selectResult[0]
 }
 
 export const selectAllComplete = async(connection, userId) =>{
     const selectAllCompleteQuery = `select target_recipe from Challenge where owner = ${userId} and status = 'complete' order by  created_at DESC;`
+    console.log(selectAllCompleteQuery)
     const selectResult = await connection.query(selectAllCompleteQuery);
     return selectResult[0]
 }
 
 
-export const deleteScrapRow = async(connection, deleteSubQuery) =>{
-    const deleteQuery = `delete from scrap where target_recipe in ` + deleteSubQuery + ';'
+export const deleteScrapRow = async(connection, deleteSubQuery,userId) =>{
+    const deleteQuery = `delete from scrap where target_recipe in ` + deleteSubQuery +  ` and owner = ${userId}` + ';'
+    console.log(deleteQuery)
     const deleteResult = await connection.query(deleteQuery);
-    console.log(deleteResult)
+    return deleteResult[0].affectedRows
+}
+
+export const updateNickname = async(connection, userId, nickname) =>{
+    console.log("in dao", userId, nickname)
+    const updateNicknameQuery = `update user set nickname = '${nickname}' where Id = ${userId};`
+    console.log(updateNicknameQuery);
+    const updateResult = await connection.query(updateNicknameQuery)
+    return updateResult[0].affectedRows
 }

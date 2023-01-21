@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { selectAllChallenging, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
+import { selectAllChallenging, selectAllComplete, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo"
@@ -14,6 +14,7 @@ export const checkExistEmail = async(email)=>{
 }
 
 export const checkExistNickname = async(nickname) =>{
+    console.log("in provider", nickname)
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectUserByNickname(connection, nickname);
     return result

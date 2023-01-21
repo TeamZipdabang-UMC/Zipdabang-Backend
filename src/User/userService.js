@@ -1,6 +1,6 @@
 import { checkExistEmail } from "./userProvider"
 import pool from "../../config/database"
-import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData } from "./userDao";
+import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData, updateNickname } from "./userDao";
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo";
 import bcrypt from "bcrypt"
@@ -112,6 +112,8 @@ export const startWithGoogle = async(userEmail, userProfile) => {
 export const finishSocialLogin = async(dataObj) =>{
     // 존재성 여부는 할 필요가 없다
 
+    console.log("in service", "dataObj : ", dataObj)
+
     const connection = await pool.getConnection(async conn => conn);
 
     const now = new Date()
@@ -139,9 +141,18 @@ export const finishSocialLogin = async(dataObj) =>{
 }
 
 
-export const deleteScraps = async(target) =>{
+export const deleteScraps = async(target,userId) =>{
+    console.log("in service", target, userId)
     const connection = await pool.getConnection(async conn => conn)
     let deleteSubQuery = target.join(",")
     deleteSubQuery = '(' + deleteSubQuery + ')'
-    const result = await deleteScrapRow(connection, deleteSubQuery);
+    const result = await deleteScrapRow(connection, deleteSubQuery,userId);
+    return result
 }
+
+export const changeNickname = async(userId, nickname) =>{
+    console.log("in service", userId, nickname)
+    const connection = await pool.getConnection(async conn => conn)
+    const updateResult = await updateNickname(connection, userId, nickname)
+    return updateResult
+} 
