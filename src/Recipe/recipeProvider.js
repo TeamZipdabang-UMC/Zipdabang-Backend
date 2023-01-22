@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList } from "./recipeDao";
+import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList } from "./recipeDao";
 
 export const getCategoryID = async(categoryId, is_official)=>{
     const connection = await pool.getConnection(async conn => conn);
@@ -25,6 +25,19 @@ export const getThumbCategoryID = async(categoryId)=>{
 export const getCategoryPagingID = async(categoryId, last)=>{
     const connection = await pool.getConnection(async conn => conn);
     const result = await getCategoryPagingList(connection, categoryId, last);
+    connection.release();
+    return result
+}
+
+export const getAllRecipesList = async(is_official)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await getRecipesList(connection, is_official);
+    connection.release();
+    return result
+}
+export const searchKeyword = async(keyword, category)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await searchKeywordList(connection, keyword, category);
     connection.release();
     return result
 }

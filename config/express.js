@@ -17,9 +17,11 @@ app.use(express.urlencoded({extended:true}));
 app.use(cors());
 
 app.use('/users', userRouter);
+app.use('/recipes', recipeRouter);
 app.use('/comments', commentRouter);
 app.use('/', rootRouter);
 app.use('/recipes', recipeRouter);
 app.use('/notice', noticeRouter);
+
 
 export default app;

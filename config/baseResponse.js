@@ -8,4 +8,4 @@ export const initResponse = ()=>{
     baseResponse.success = null
     baseResponse.data = null
     baseResponse.error = null
-}
+} 
