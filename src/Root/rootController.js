@@ -5,7 +5,16 @@ import {getThumbCategoryID} from '../Recipe/recipeProvider';
 
 
 export const enterMain = async(req, res)=>{
-    const {userId, userEmail} = req.verifiedToken;
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
+    const {userId} = req.verifiedToken;
     const myScrapResult = await getMyScrapOverView(userId);
     const coffeeCategoryOverView = await getThumbCategoryID(1);
     const beverageCategoryOverView = await getThumbCategoryID(2);
@@ -14,7 +23,7 @@ export const enterMain = async(req, res)=>{
     const smoothieCategoryOverView = await getThumbCategoryID(5);
     const healthCategoryOverView = await getThumbCategoryID(6);
     
-    const mainPageResponse = {
+    baseResponse.data = {
         myScrapOverView : myScrapResult,
         coffeeCategoryOverView : coffeeCategoryOverView,
         beverageCategoryOverView : beverageCategoryOverView,
@@ -24,5 +33,5 @@ export const enterMain = async(req, res)=>{
         healthCategoryOverView : healthCategoryOverView
     }
 
-    res.send(JSON.stringify(mainPageResponse))
+    return res.send(JSON.stringify(baseResponse))
 }
