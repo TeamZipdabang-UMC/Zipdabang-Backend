@@ -11,7 +11,7 @@ recipeRouter.get('/category/',jwtMiddleware, getCategory); //
 recipeRouter.get('/category/paging/',jwtMiddleware, getCategoryPaging);
 
 // 전체 레시피 출력
-recipeRouter.get('/recipes/allView/', jwtMiddleware, getAllRecipes)
+recipeRouter.get('/allView/', jwtMiddleware, getAllRecipes)
 
 // 레시피 검색 
-recipeRouter.get('/recipes/search/',jwtMiddleware, getSearch);
+recipeRouter.get('/search/',jwtMiddleware, getSearch);
