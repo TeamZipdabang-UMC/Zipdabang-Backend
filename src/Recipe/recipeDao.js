@@ -6,7 +6,7 @@ export const getCategoryList = async(connection, categoryId, is_official) =>{
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     WHERE recipe.category=${categoryId} and is_official = ${is_official}
     order by created_at desc
-    limit 8
+    limit 12
     ;`;
 
     const categoryList = await connection.query(selectCategorryQuery, categoryId);
@@ -20,7 +20,7 @@ export const getMainCategoryList = async(connection, categoryId) =>{
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     WHERE recipe.category=?
     order by created_at desc
-    limit 8
+    limit 12
     ;`;
 
     const categoryList = await connection.query(selectCategorryQuery, categoryId);
@@ -46,11 +46,26 @@ export const getCategoryPagingList = async(connection, categoryId, last) =>{
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     where recipe.category=${categoryId} and created_at < ( select created_at from recipe where id=${last} )
     order by created_at desc
-    limit 8
+    limit 12
     ;`;
     const categoryList = await connection.query(selectCategorryQuery, categoryId, last);
     return categoryList[0];
 }
+
+export const getRecipesList = async(connection, is_official) =>{
+
+    const selectCategorryQuery = 
+    `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url, likes 
+    FROM recipe
+    WHERE recipe.is_official = ?
+    order by created_at desc
+    limit 12
+    ;`;
+
+    const categoryList = await connection.query(selectCategorryQuery, is_official);
+    return categoryList[0];
+}
+
 
 export const searchKeywordList = async(connection, keyword, category) =>{
     //console.log(typeof(keyword))
