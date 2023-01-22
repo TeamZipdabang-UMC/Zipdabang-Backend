@@ -19,7 +19,8 @@ app.use(cors());
 app.use('/users', userRouter);
 app.use('/recipes', recipeRouter);
 app.use('/comments', commentRouter);
-app.use('/root', rootRouter);
+app.use('/', rootRouter);
+app.use('/recipes', recipeRouter);
 app.use('/notice', noticeRouter);
 
 

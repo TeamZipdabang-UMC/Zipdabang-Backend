@@ -3,110 +3,167 @@ import { createComment, deleteCommentService, updateComment } from "./commentSer
 
 
 export const newComment = async(req, res) => {
-    const {userId, userEmail} = req.verifiedToken
-    const {target, body} = req.body
-
-    const errResponseObj = 
-    {
+    let baseResponse = {
         success : false,
-        error : ``,
-        errorType : ``
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
     }
 
+    const {userId} = req.verifiedToken
+    const {target, body} = req.body
+
+    console.log("in controller",userId, target, body)
     if (!target)
     {
-        errResponseObj.error = `대상 레시피 아이디 누락`,
-        errResponseObj.errorType = `no recipe sent`
+        baseResponse.error = `대상 레시피 아이디 누락`
+        return res.status(400).send(JSON.stringify(baseResponse))
     }
     else if (!body)
     {
-        errResponseObj.error = `댓글 내용 누락`,
-        errResponseObj.errorType = `no comment body sent`
+        baseResponse.error = '댓글 내용 누락'
+        return res.status(400).send(JSON.stringify(baseResponse))
     }
 
-    const result = await createComment(userId, target, body)
-    res.send(JSON.stringify(result))
+    const result = await createComment(userId, target, body, baseResponse)
+    console.log("result",result)
+    return res.send(JSON.stringify(result))
 }
 
 export const getCommentsOverView = async(req, res) =>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
     const {recipe:target} = req.query
+
+    if(!target){
+        baseResponse.error = "레시피 아이디 주세요"
+        return res.status(400).send(JSON.stringify(baseResponse))
+    }
+    console.log("controller", target)
     const result = await commentsOverView(target)
 
-    const responseObj = {
+    baseResponse.success = true
+    baseResponse.data = {
         comments : result
     }
-
-    return res.send(JSON.stringify(responseObj))
+    return res.send(JSON.stringify(baseResponse))
 }
 
 export const getCommentsFirst = async(req, res) =>{
-    const {recipe : target} = req.query
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
+    const {recipe:target} = req.query
+
+    if(!target){
+        baseResponse.error = "레시피 아이디 주세요"
+        return res.status(400).send(JSON.stringify(baseResponse))
+    }
+    console.log("controller", target)
     const result = await commentsViewFirst(target)
 
-    const responseObj = {
+    baseResponse.data = {
         comments : result
     }
 
-    return res.send(JSON.stringify(responseObj))
+    return res.send(JSON.stringify(baseResponse))
 }
 
 export const getCommentsMore = async(req, res) =>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
     const {recipe:target, last} =  req.query
+    if (!target || !last){
+        baseResponse.error = "레시피 아이디 혹은 마지막 댓글 아이디 주세여"
+        return res.status(400).send(JSON.stringify(baseResponse))
+    }
     const result = await commentsViewMore(target, last)
 
-    const responseObj = {
+    baseResponse.data = {
         comments : result
     }
 
-    return res.send(JSON.stringify(responseObj))
+    console.log(baseResponse)
+    return res.send(JSON.stringify(baseResponse))
 }
 
 export const patchComment = async(req, res) =>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
     const {owner, commentId:target, newBody} = req.body
     const {userId} = req.verifiedToken
 
-    const errorResponseObj = {
-        success : false,
-        error : ``,
-        errorType : ``
-    }
     if (!owner){
-        errorResponseObj.error = `소유자 아이디를 넘겨주세요`,
-        errorResponseObj.errorType = `no owner Id`
-        res.send(JSON.stringify(errorResponseObj))
+        baseResponse.error = `소유자 아이디를 넘겨주세요`
+        return res.status(400).send(JSON.stringify(baseResponse))
     }
     else if (!target){
-        errorResponseObj.error = `수정 대상 댓글 아이디를 넘겨주세요`,
-        errorResponseObj.errorType = `no comment Id`
-        res.send(JSON.stringify(errorResponseObj))
+        baseResponse.error = `수정 대상 댓글 아이디를 넘겨주세요`
+        return res.status(400).send(JSON.stringify(baseResponse))
+    }
+    else if (!newBody){
+        baseResponse.error = `수정할 내용 넘겨주세요`
+        return res.status(400).send(JSON.stringify(baseResponse))
     }
 
 
-    const result = await updateComment(userId, owner, target,newBody,errorResponseObj);
+    const result = await updateComment(userId, owner, target,newBody,baseResponse);
 
     res.send(JSON.stringify(result))
 }
 
 export const deleteCommentController = async(req, res) =>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
     const {owner, commentId:target} = req.body
     const {userId} = req.verifiedToken
 
-    const errorResponseObj = {
-        success : false,
-        error : ``,
-        errorType : ``
-    }
     if (!owner){
-        errorResponseObj.error = `소유자 아이디를 넘겨주세요`,
-        errorResponseObj.errorType = `no owner Id`
-        res.send(JSON.stringify(errorResponseObj))
+        baseResponse.error = `소유자 아이디를 넘겨주세요`
+        return res.status(400).send(JSON.stringify(baseResponse))
     }
     else if (!target){
-        errorResponseObj.error = `삭제 대상 댓글 아이디를 넘겨주세요`,
-        errorResponseObj.errorType = `no comment Id`
-        res.send(JSON.stringify(errorResponseObj))
+        baseResponse.error = `삭제 대상 댓글 아이디를 넘겨주세요`
+        return res.status(400).send(JSON.stringify(baseResponse))
     }
 
-    const result = await deleteCommentService(userId, owner, target, errorResponseObj);
+    const result = await deleteCommentService(userId, owner, target, baseResponse);
     res.send(JSON.stringify(result))
 }
