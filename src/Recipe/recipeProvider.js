@@ -1,5 +1,5 @@
 import pool from "../../config/database";
-import { checkRecipeExistsDao, checkTempSaveExists, checkUserExistsDao, selectMyRecipes, selectMyRecipesPaging } from "./recipeDao";
+import { checkRecipeExistsDao, checkTempSaveExists, checkUserExistsDao, selectChallenge, selectLikes, selectMyRecipes, selectMyRecipesPaging } from "./recipeDao";
 
 
 
@@ -64,4 +64,19 @@ export const MyRecipeList = async (userId, last)=>{
     connection.release();
 
     return result;
+}
+
+export const getChallengeStatus = async(userId, recipeId)=>{
+    console.log("in provider", userId, recipeId)
+
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectChallenge(connection,userId,recipeId);
+    connection.release()
+    return result;
+}
+
+export const checkRecipeLikes = async(recipeId) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectLikes(connection, recipeId);
+    return result
 }

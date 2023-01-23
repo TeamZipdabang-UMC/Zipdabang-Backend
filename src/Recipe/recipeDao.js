@@ -44,12 +44,13 @@ export const getTempSavedInfos = async(connection, recipeId)=>{
 export const checkRecipeExistsDao = async(connection, recipeId)=>{
     const sql = `select id from recipe where id='${recipeId}';`
     const result = await connection.query(sql);
-
-    return result;
+    console.log(result[0])
+    return result[0];
 }
 
 export const checkUserExistsDao = async(connection,userId)=>{
-    const sql = `select owner from recipe where owner='${owner}';`
+    // const sql = `select owner from recipe where owner='${owner}';`
+    const sql = `select Id from user where Id = ${userId};`
     const result = await connection.query(sql);
 
     return result;
@@ -127,35 +128,31 @@ export const updateRecipeDao = async (connection,recipe, category, ingredients, 
 }
 
 export const selectMyRecipes = async (connection, userId)=>{
-    const sql = `select name, img_url, likes from recipe 
+    const sql = `select Id as recipeId, owner, name, image_url, likes from recipe 
     where recipe.owner = '${userId}'
     order by created_at desc
-    limit 8;`
+    limit 12;`
     const result = await connection.query(sql);
 
-    console.log(result);
 
     return result;
 }
 
 export const selectMyRecipesPaging = async (connection, userId, last)=>{
-    const sql = `select id, name, img_url, likes from recipe 
+    const sql = `select Id as recipeId, owner, name, image_url, likes from recipe 
     where recipe.owner = '${userId}' and created_at < (select created_at from recipe where id='${last}')
     order by created_at desc
-    limit 8;`
+    limit 12;`
     const result = await connection.query(sql);
 
-    console.log(result);
 
     return result;
 }
 
-export const deleteRecipeDao = async(connection, userId, target)=>{
-    const sql = `delete recipe, beveragecategory, ingredient, step from recipe
-    inner join ingredient inner join step on recipe.id = ingredient.target_recipe = step.target_recipe
-    inner join beveragecategory on recipe.category = beveragecategory.id
-    where recipe.id in ${target} and recipe.owner = '${userId}';`
+export const deleteRecipeDao = async(connection, userId, deleteSubQuery)=>{
+    const sql = `delete from recipe where owner = ${userId} and Id in` + deleteSubQuery + ';'
 
+    console.log(sql)
     const result = await connection.query(sql);
 
     console.log(result);
@@ -164,7 +161,7 @@ export const deleteRecipeDao = async(connection, userId, target)=>{
 }
 
 export const insertChallengeTable = async(connection, userId, recipeId)=>{
-    const sql = `insert into challenge (owner, target_recipe, status) value('${userId}', '${recipeId}', 'challenge');`
+    const sql = `insert into challenge (owner, target_recipe, status) value('${userId}', '${recipeId}', 'challenging');`
 
     const result = await connection.query(sql);
 
@@ -202,9 +199,40 @@ export const updateLikes = async(connection, recipeId)=>{
 }
 
 export const insertScrap = async(connection, userId,recipeId) =>{
-    const sql = `insert into scrap (owner, target_recipe) value('${userId}', '${recipeId}');`;
+    const sql = `insert into scrap (owner, target_recipe) value(${userId}, ${recipeId});`;
 
     const result = await connection.query(sql);
 
     return result;
+}
+
+export const selectChallenge = async(connection,userId, recipeId) =>{
+    const sql = `select status from challenge where owner = ${userId} and target_recipe = ${recipeId};`
+    const selectResult = await connection.query(sql)
+    return selectResult[0]
+}
+
+export const selectLikes = async(connection, recipeId) =>{
+    const sql = `select likes from recipe where Id = ${recipeId};`
+    const result = await connection.query(sql)
+
+    return result[0]
+}
+
+export const selectRecipeInfo = async(connection, recipeId) =>{
+    const sql = `select Id as recipeId, owner,name, image_url, likes, created_at, intro, take_time, review from recipe where Id = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0]
+}
+
+export const selectIngredients = async(connection, recipeId) =>{
+    const sql = `select name, quantity from ingredient where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0]
+}
+
+export const selectMethods = async(connection, recipeId) =>{
+    const sql = `select step, step_description, step_image_url from method where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0]
 }

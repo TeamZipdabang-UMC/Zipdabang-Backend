@@ -11,18 +11,18 @@ import { postDeleteRecipe, getCreateUserRecipe, getShowRecipeInfo, postStartChal
 
 const recipeRouter = express.Router();
 
-recipeRouter.route("/create/user-recipe")
-.all(jwtMiddleware)
-.get(getCreateUserRecipe)
-.post(postCreateUserRecipe);
+// recipeRouter.route("/create/user-recipe")
+// .all(jwtMiddleware)
+// .get(getCreateUserRecipe)
+// .post(postCreateUserRecipe);
 
-recipeRouter.route("/create/user-recipe/temp-save")
-.all(jwtMiddleware)
-.get(getTempSaveUserRecipe)
-.post(postTempSaveUserRecipe);
+// recipeRouter.route("/create/user-recipe/temp-save")
+// .all(jwtMiddleware)
+// .get(getTempSaveUserRecipe)
+// .post(postTempSaveUserRecipe);
 
-recipeRouter.route("/create/save-img/:recipeId([0-9]+)")
-.post(upload.single("img"), saveImgURL);
+// recipeRouter.route("/create/save-img/:recipeId([0-9]+)")
+// .post(upload.single("img"), saveImgURL);
 
 recipeRouter.route("/:recipeId([0-9]+)/info")
 .all(jwtMiddleware)
@@ -40,16 +40,16 @@ recipeRouter.route("/:recipeId([0-9]+)/scrap")
 .all(jwtMiddleware)
 .post(postScrap)
 
-recipeRouter.route("/:recipeId([0-9]+)/delete")
+recipeRouter.route("/my-recipes/delete")
 .all(jwtMiddleware)
-post(postDeleteRecipe)
+.post(postDeleteRecipe)
 
 recipeRouter.route("/:recipeId([0-9]+)/update")
 .all(jwtMiddleware)
 .get(getUpdateRecipe)
 .post(postUpdateRecipe)
 
-recipeRouter.route("/myRecipes")
+recipeRouter.route("/my-recipes")
 .all(jwtMiddleware)
 .get(getMyRecipes)
 
