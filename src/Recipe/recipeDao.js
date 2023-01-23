@@ -56,7 +56,7 @@ export const getRecipesList = async(connection, is_official) =>{
 
     const selectCategorryQuery = 
     `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url, likes 
-    FROM recipe
+    from recipe inner join beveragecategory on recipe.category = beveragecategory.id
     WHERE recipe.is_official = ?
     order by created_at desc
     limit 12
@@ -64,6 +64,19 @@ export const getRecipesList = async(connection, is_official) =>{
 
     const categoryList = await connection.query(selectCategorryQuery, is_official);
     return categoryList[0];
+}
+
+
+export const getViewPaging = async(connection, is_official, last) =>{
+    const AllViewPagingQuery = 
+    `SELECT recipe.id, beveragecategory.name, recipe.name, image_url, likes 
+    FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
+    where recipe.is_official=${is_official} and created_at < ( select created_at from recipe where id=${last} )
+    order by created_at desc
+    limit 12
+    ;`;
+    const AllViewPagingData = await connection.query(AllViewPagingQuery, is_official, last);
+    return AllViewPagingData[0];
 }
 
 
@@ -96,16 +109,19 @@ export const searchKeywordList = async(connection, keyword, category) =>{
     const splited = keyword.split(" ");
 
     let i=0;
-    let result = new Array(splited.length);
+    //let result = new Array(splited.length);
+    let result = []
     while (i<splited.length) {
         const searchQuery = 
         `
         select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%' and category = '${category}';
         `;
         const categoryList = await connection.query(searchQuery, splited[i]);
-        console.log(categoryList[0]);
-        result[i]=categoryList[0];
+        //console.log(categoryList[0]);
+        //result[i]=categoryList[0];
+        result.push(categoryList[0]);
         i=i+1;
+        //console.log(result)
 
     }
     return result;
