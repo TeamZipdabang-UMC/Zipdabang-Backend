@@ -5,7 +5,16 @@ import {getThumbCategoryID} from '../Recipe/recipeProvider';
 import { baseResponse, initResponse } from '../../config/baseResponse'
 
 export const enterMain = async(req, res)=>{
-    const {userId, userEmail} = req.verifiedToken;
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).send(JSON.stringify(baseResponse))
+    }
+    const {userId} = req.verifiedToken;
     const myScrapResult = await getMyScrapOverView(userId);
     let count=0
     const coffeeCategoryOverView = await getThumbCategoryID(1);
@@ -19,6 +28,7 @@ export const enterMain = async(req, res)=>{
     const smoothieCategoryOverView = await getThumbCategoryID(5);
     if(typeof smoothieCategoryOverView[0] == 'undefined') count+=1
     const healthCategoryOverView = await getThumbCategoryID(6);
+
     if(typeof healthCategoryOverView[0] == 'undefined') count+=1
     console.log(count)
     if( count == 6 ){
@@ -29,6 +39,7 @@ export const enterMain = async(req, res)=>{
          
     }
     const mainPageResponse = {
+
         myScrapOverView : myScrapResult,
         coffeeCategoryOverView : coffeeCategoryOverView,
         beverageCategoryOverView : beverageCategoryOverView,
@@ -36,6 +47,7 @@ export const enterMain = async(req, res)=>{
         adeCategoryOverView : adeCategoryOverView,
         smoothieCategoryOverView : smoothieCategoryOverView,
         healthCategoryOverView : healthCategoryOverView
+    
     }
     if(mainPageResponse){
         baseResponse.success = true
@@ -49,4 +61,5 @@ export const enterMain = async(req, res)=>{
         baseResponse.error = "데이터가 없습니다."
         return res.status(404).json(baseResponse);      
     }
+
 }
