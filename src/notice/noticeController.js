@@ -7,12 +7,13 @@ import exp from "constants";
 import { json } from "body-parser";
 import { baseResponse, initResponse } from '../../config/baseResponse'
 
+
 export const noticeList = async(req, res) => {
     initResponse;
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).send.json(baseResponse)
     }
 
     const getNotice = await getNoticeList()
@@ -20,13 +21,13 @@ export const noticeList = async(req, res) => {
         baseResponse.success = true
         baseResponse.data = getNotice
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify(baseResponse));
+        return res.status(200).send.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "공지가 없습니다"
-        return res.status(404).send(JSON.stringify(baseResponse));
+        return res.status(404).send.json(baseResponse)
     }
 }
 
@@ -35,14 +36,14 @@ export const selectnotice = async(req, res) => {
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).send.json(baseResponse)
     }
     const {params:{noticeId}} = req;
     if(!noticeId){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "공지 id가 없습니다"
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).send.json(baseResponse)
     }
     const getNoticeid = await getNoticeId(noticeId)
     
@@ -50,13 +51,13 @@ export const selectnotice = async(req, res) => {
         baseResponse.success = true
         baseResponse.data = getNoticeid
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify(baseResponse));
+        return res.status(200).send.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "공지가 없습니다."
-        return res.status(404).send(JSON.stringify(baseResponse));
+        return res.status(404).send.json(baseResponse)
     }
 }
 
@@ -65,18 +66,18 @@ export const getTos = async(req, res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).send.json(baseResponse)
     }
     const gettos = await getTosList();
     if (gettos[0]){
         baseResponse.success = true
         baseResponse.data = gettos
-        res.send(JSON.stringify(baseResponse));
+        res.send.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.error = "데이터가 없습니다."
-        res.send(JSON.stringify(baseResponse));
+        res.send.json(baseResponse)
     }
 }
 
@@ -84,7 +85,7 @@ export const createQuestion = async(req, res) => {
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).send.json(baseResponse)
     }
     const {userId} = req.verifiedToken;
     const {email, text} = req.body
@@ -93,14 +94,20 @@ export const createQuestion = async(req, res) => {
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "email이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
-    // 이메일 양식 확인 코드 필요
+    // 이메일 양식 확인 코드 필요 
+    if(!regexEmail.test(email)){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "이메일 양식이 잘못되었습니다."
+        return res.status(400).json(baseResponse)
+    }
     if(!text){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "text가 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse))      
+        return res.status(400).send.json(baseResponse)      
     }
     const postQuestiondata = await postQuestion(userId, email, text);
     const postedQuestion = {
@@ -112,7 +119,7 @@ export const createQuestion = async(req, res) => {
         baseResponse.success = true
         baseResponse.data = postedQuestion
         baseResponse.error = null
-        return res.status(201).send(JSON.stringify(baseResponse))
+        return res.status(201).send.json(baseResponse)
     }
 
 }
@@ -123,7 +130,7 @@ export const getfaq = async(req, res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).send.json(baseResponse)
     }
 
     const getfaq = await getFaqList();
@@ -131,12 +138,12 @@ export const getfaq = async(req, res) =>{
         baseResponse.success = true
         baseResponse.data = getfaq
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify(baseResponse));
+        return res.status(200).send.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다."
-        return res.status(404).send(JSON.stringify(baseResponse));
+        return res.status(404).send.json(baseResponse)
     }
 }

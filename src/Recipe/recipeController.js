@@ -4,6 +4,7 @@ import fetch from "node-fetch"
 import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList, getAllViewPaging } from "./recipeProvider";
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
+import { type } from "os";
 
 
 export const getCategory = async(req,res) =>{
@@ -12,33 +13,40 @@ export const getCategory = async(req,res) =>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "없는 카테고리 입니다."
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).json(baseResponse);
     }
-    if(!main_page){
+    if(typeof main_page == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "main page 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
-    /*
-    if(!is_official){
+    /* 1 or 0 
+    if(is_official == undifined){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "is_official 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
     */
+    if(typeof is_official == 'undefined'){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "is_official 값이 없습니다."
+        return res.status(400).json(baseResponse);     
+    }
+
     if(is_official !=0 && is_official != 1 ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "잘못된 is_official값 입니다."
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).json(baseResponse);
     }
 
     if(main_page==1){
@@ -48,13 +56,13 @@ export const getCategory = async(req,res) =>{
             baseResponse.success = true;
             baseResponse.error = null
             baseResponse.data = getCategoryId;
-            return res.status(200).send(JSON.stringify(baseResponse));
+            return res.status(200).json(baseResponse);
         }
         else{
             baseResponse.success = false
             baseResponse.data = null
             baseResponse.error = "데이터가 없습니다."
-            return res.status(404).send(JSON.stringify(baseResponse));       
+            return res.status(404).json(baseResponse);       
         }
     }
 
@@ -64,13 +72,13 @@ export const getCategory = async(req,res) =>{
             baseResponse.success = true
             baseResponse.data = getCategoryId
             baseResponse.error = null
-            return res.status(200).send(JSON.stringify(baseResponse));
+            return res.status(200).json(baseResponse);
         }
         else{
             baseResponse.success = false
             baseResponse.data = null
             baseResponse.error = "데이터가 없습니다."
-            return res.status(404).send(JSON.stringify(baseResponse))        
+            return res.status(404).json(baseResponse)        
         }
     }
         
@@ -82,20 +90,20 @@ export const thumbCategory = async(req, res)=>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {params:{categoryId}} = req;
     if(!categoryId){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "categoryId 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "없는 카테고리 입니다."
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).json(baseResponse);
     }
 
     const getCategoryId = await getThumbCategoryID(categoryId)
@@ -103,13 +111,13 @@ export const thumbCategory = async(req, res)=>{
         baseResponse.success = true
         baseResponse.data = getCategoryId
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify(baseResponse));
+        return res.status(200).json(baseResponse);
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다."
-        return res.status(404).send(JSON.stringify(baseResponse));      
+        return res.status(404).json(baseResponse);      
     }
 
 }
@@ -119,26 +127,26 @@ export const getCategoryPaging = async(req,res) =>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {categoryId, last} = req.body;
     if(!categoryId){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "categoryId 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
     if(!last){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "last 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "없는 카테고리 입니다."
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).json(baseResponse);
     }
 
 
@@ -147,13 +155,13 @@ export const getCategoryPaging = async(req,res) =>{
         baseResponse.success = true
         baseResponse.data = getCategoryId
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify(baseResponse));
+        return res.status(200).json(baseResponse);
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다"
-        return res.status(404).send(JSON.stringify(baseResponse));     
+        return res.status(404).json(baseResponse);     
     }
 
 }
@@ -164,25 +172,22 @@ export const getAllRecipes = async(req, res)=>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {is_official} = req.body;
-    //
-    /*
-    if(is_official == []){
+    if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "is_official 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse);     
     }
-    */
 
     
     if(is_official !=0 && is_official != 1 ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "잘못된 is_official값 입니다."
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).json(baseResponse);
     }
     
     const getRecipes = await getAllRecipesList(is_official)
@@ -192,13 +197,13 @@ export const getAllRecipes = async(req, res)=>{
         baseResponse.success = true
         baseResponse.data = getRecipes
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify( baseResponse));
+        return res.status(200)(JSON.stringify( baseResponse));
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다"
-        return res.status(404).send(JSON.stringify( baseResponse));
+        return res.status(404)(JSON.stringify( baseResponse));
     }
 
 }
@@ -209,29 +214,27 @@ export const getAllRecipesPaging = async(req,res) =>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {is_official, last} = req.body;
-    /*
-    if(!is_official){
+    if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "is_official 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
-    */
 
     if(!last){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "last 값이 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse));     
+        return res.status(400).json(baseResponse);     
     }
     if(is_official !=0 && is_official != 1 ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "잘못된 is_official값 입니다."
-        return res.status(400).send(JSON.stringify(baseResponse));
+        return res.status(400).json(baseResponse);
     }
 
 
@@ -241,13 +244,13 @@ export const getAllRecipesPaging = async(req,res) =>{
         baseResponse.success = true
         baseResponse.data = getAllViewPagingData
         baseResponse.error = null
-        return res.status(200).send(JSON.stringify(baseResponse));
+        return res.status(200).json(baseResponse);
     }
     else{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다"
-        return res.status(404).send(JSON.stringify(baseResponse));     
+        return res.status(404).json(baseResponse);     
     }
 
 }
@@ -256,19 +259,19 @@ export const getAllRecipesPaging = async(req,res) =>{
 
 export const getSearch = async(req, res)=>{
     const {keyword} = req.query;
-    console.log("keyword ", keyword)
-    console.log("초기화 후", baseResponse)
+    //console.log("keyword ", keyword)
+    //console.log("초기화 후", baseResponse)
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     if(!keyword){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "키워드가 없습니다"
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
 
     let count=0
@@ -289,7 +292,7 @@ export const getSearch = async(req, res)=>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다."
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
          
     }
     const result = {
@@ -305,13 +308,7 @@ export const getSearch = async(req, res)=>{
         baseResponse.success = true
         baseResponse.error = null
         baseResponse.data = result
-        return res.status(200).send(JSON.stringify(baseResponse))
-    }
-    else{
-       baseResponse.success = false
-       baseResponse.data = null
-       baseResponse.error = "데이터가 없습니다"
-       return res.status(404).send(JSON.stringify(baseResponse))
+        return res.status(200).json(baseResponse)
     }
 
 }
