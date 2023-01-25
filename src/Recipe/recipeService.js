@@ -1,0 +1,213 @@
+import pool from "../../config/database";
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteRecipeDao, insertChallengeTable, insertScrap, selectIngredients, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
+import { checkRecipeExists, getChallengeStatus } from "./recipeProvider";
+
+export const saveThumbURL = async(userId, recipeId, dest)=>{
+
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result = await checkRecipeExists(recipeId);
+
+    if(result != null){
+        //1. 이미 레시피 id가 있을 때 기존 recipe id에 저장
+        await updateThumbURL(connection, recipeId, dest);
+        console.log("기존 레시피 정보에 thumb 추가");
+
+        connection.release();
+
+        return null;
+    }
+    else{
+        //2. 레시피id가 없을 때 -> 새 레시피id를 생성하여 저장
+        const newRecipeId = await createRecipeForThumb(connection, userId, dest);
+        console.log("새 레시피 정보에 thumb 추가");
+
+        connection.release();
+
+        return newRecipeId;
+    }
+}
+
+export const saveStepImgURL = async(recipeId, step, dest)=>{
+
+    const connection = await pool.getConnection(async conn => conn)
+    
+    const stepInfo = await checkStepExists(connection, recipeId,step);
+
+    if(stepInfo != null){
+        //1. 이미 스텝넘버가 있을 때(description만 먼저 있을 때) -> 기존 스텝에 저장
+        const stepId = stepInfo[0].id;
+
+        await updateStepURL(connection, stepId, dest);
+        console.log("기존 step 정보에 img 추가");
+
+        connection.release();
+
+        return null;
+    }
+    else{
+        //2. 스텝넘버가 없을 때 -> 새 id를 생성하여 저장
+        const newStepId = await createStepForImg(connection, dest);
+        console.log("새 레시피 정보에 thumb 추가");
+
+        connection.release();
+
+        return newStepId;
+    }
+}
+
+
+
+export const updateRecipe = async(userId, recipe, category, ingredients, steps)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result  = updateRecipeDao(connection,recipe, category, ingredients, steps);
+
+    connection.release();
+
+    if(result != null){
+        return {
+            success : true,
+            recipeId : recipe.id
+           };
+    }
+    else{
+        return {
+            success : false,
+            error : "DB-레시피 수정 실패"
+           }
+    }
+}
+
+export const deleteRecipe = async(userId, target) =>{
+
+    const connection = await pool.getConnection(async conn => conn)
+
+    let deleteSubQuery = target.join(",")
+    deleteSubQuery = '(' + deleteSubQuery + ')'
+
+    console.log(deleteSubQuery)
+    const result = await deleteRecipeDao(connection, userId, deleteSubQuery)
+
+    connection.release();
+    if (result[0].affectedRows > 0){
+        return {
+            success : true
+           }
+    }
+    else {
+        return {
+            success : false
+           }
+    }
+}
+
+export const getSavedInfo = async(userId, recipeId) =>{
+
+    const connection = await pool.getConnection(async conn => conn)
+
+    const recipeInfo = await selectRecipeInfo(connection,recipeId);
+    const ingredientInfo = await selectIngredients(connection,recipeId);
+    const methodInfo = await selectMethods(connection,recipeId);
+    console.log(recipeInfo, ingredientInfo, methodInfo)
+    connection.release();
+
+    const dataObj = {
+        recipe : recipeInfo,
+        ingredient : ingredientInfo,
+        steps : methodInfo
+    }
+    
+    return dataObj
+}
+
+export const changeChallengeStatus = async(userId, recipeId) =>{
+
+    console.log("in service", userId, recipeId)
+    const connection = await pool.getConnection(async conn => conn)
+
+    const challengeStatus = await getChallengeStatus(userId, recipeId);
+
+    console.log("check status", challengeStatus[0])
+    let result;
+    if (challengeStatus.length == 0){
+        result = await insertChallengeTable(connection, userId, recipeId);
+    }
+    else if (challengeStatus[0].status == 'challenging'){
+        result = await updateChallengeTable(connection, userId, recipeId);
+    }
+    else if (challengeStatus[0].status == 'complete'){
+        result = await deleteChallengeTable(connection, userId, recipeId);
+    }
+
+    connection.release();
+
+    console.log(result[0].affectedRows)
+    if(result[0].affectedRows > 0){
+        if (challengeStatus.length == 0)
+            return {
+                success : true,
+                data : 'challenging'
+            }
+        else{
+            switch(challengeStatus[0].status){
+                case 'challenging':
+                    return{
+                        success : true,
+                        data : 'complete'
+                    }
+                    break
+                case 'complete':
+                    return{
+                        success : true,
+                        data : 'clear'
+                    }
+            }
+        }
+    }
+    else{
+        return {
+            success : false
+        }
+    }
+}
+
+export const addLikeToRecipe = async(recipeId)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result = await updateLikes(connection, recipeId);
+
+    connection.release();
+
+    console.log(result[0])
+    if(result[0].affectedRows > 0){
+        return {
+            success : true
+        }
+    }
+    else{
+        return {
+            success : false,
+           }
+    }
+}
+
+export const ScrapRecipe = async(userId, recipeId)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result = await insertScrap(connection, userId,recipeId);
+
+    connection.release();
+
+    console.log(result[0])
+    if(result[0].affectedRows > 0){
+        return {
+            success : true,
+        }
+    }
+    else{
+        return {
+            success : false,
+           }
+    }
+}

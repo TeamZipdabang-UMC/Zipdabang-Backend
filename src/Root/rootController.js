@@ -12,7 +12,7 @@ export const enterMain = async(req, res)=>{
     }
     if (!req.verifiedToken){
         baseResponse.error = 'no token'
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {userId} = req.verifiedToken;
     const myScrapResult = await getMyScrapOverView(userId);
