@@ -55,24 +55,24 @@ export const thumbCategory = async(req, res)=>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {params:{categoryId}} = req;
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.error = "없는 카테고리 입니다."
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
     const getCategoryId = await getThumbCategoryID(categoryId)
     if(getCategoryId[0]){
         baseResponse.success = true
         baseResponse.data = getCategoryId
-        res.send(JSON.stringify(baseResponse));
+        res.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.error = "데이터가 없습니다."
-        res.send(JSON.stringify(responseObj))        
+        res.json(responseObj)
     }
 
 }

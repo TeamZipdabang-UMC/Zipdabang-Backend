@@ -16,7 +16,7 @@ export const getCategoryList = async(connection, categoryId, is_official) =>{
 export const getMainCategoryList = async(connection, categoryId) =>{
 
     const selectCategorryQuery = 
-    `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url, likes 
+    `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     WHERE recipe.category=?
     order by created_at desc
@@ -30,7 +30,7 @@ export const getMainCategoryList = async(connection, categoryId) =>{
 export const getThumbCategoryList = async(connection, categoryId) =>{
 
     const selectCategorryQuery = 
-    `SELECT recipe.id, beveragecategory.name, recipe.name, image_url, likes 
+    `SELECT recipe.id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     where recipe.category=${categoryId} 
     order by created_at desc
@@ -42,7 +42,7 @@ export const getThumbCategoryList = async(connection, categoryId) =>{
 
 export const getCategoryPagingList = async(connection, categoryId, last) =>{
     const selectCategorryQuery = 
-    `SELECT recipe.id, beveragecategory.name, recipe.name, image_url, likes 
+    `SELECT recipe.id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     where recipe.category=${categoryId} and created_at < ( select created_at from recipe where id=${last} )
     order by created_at desc
@@ -55,7 +55,7 @@ export const getCategoryPagingList = async(connection, categoryId, last) =>{
 export const getRecipesList = async(connection, is_official) =>{
 
     const selectCategorryQuery = 
-    `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url, likes 
+    `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe
     WHERE recipe.is_official = ?
     order by created_at desc
