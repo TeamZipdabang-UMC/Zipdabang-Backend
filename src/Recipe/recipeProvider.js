@@ -22,9 +22,11 @@ export const getThumbCategoryID = async(categoryId)=>{
     return result
 }
 
-export const getCategoryPagingID = async(categoryId, last)=>{
+export const getCategoryPagingID = async(categoryId, last, isMain, isOfficial)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await getCategoryPagingList(connection, categoryId, last);
+    if (isMain == 1)
+        isOfficial = null
+    const result = await getCategoryPagingList(connection, categoryId, last, isOfficial);
     connection.release();
     return result
 }

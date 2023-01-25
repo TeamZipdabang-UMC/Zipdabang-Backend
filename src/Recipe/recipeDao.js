@@ -40,15 +40,25 @@ export const getThumbCategoryList = async(connection, categoryId) =>{
     return categoryList[0];
 }
 
-export const getCategoryPagingList = async(connection, categoryId, last) =>{
-    const selectCategorryQuery = 
+export const getCategoryPagingList = async(connection, categoryId, last, isOfficial) =>{
+    let selectCategorryQuery = `` 
+    if (isOfficial == null)
+        selectCategorryQuery = 
+        `SELECT recipe.id, beveragecategory.name, recipe.name, image_url as image, likes 
+        FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
+        where recipe.category=${categoryId} and created_at < ( select created_at from recipe where id=${last} )
+        order by created_at desc
+        limit 12
+        ;`;
+    else
+    selectCategorryQuery =  
     `SELECT recipe.id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
-    where recipe.category=${categoryId} and created_at < ( select created_at from recipe where id=${last} )
+    where recipe.category=${categoryId} and recipe.is_official=${isOfficial} and created_at < ( select created_at from recipe where id=${last} )
     order by created_at desc
     limit 12
     ;`;
-    const categoryList = await connection.query(selectCategorryQuery, categoryId, last);
+    const categoryList = await connection.query(selectCategorryQuery);
     return categoryList[0];
 }
 
