@@ -8,7 +8,7 @@ import { addLikeToRecipe, changeChallengeStatus, deleteRecipe, getSavedInfo, sav
 
 
 export const getCategory = async(req,res) =>{
-    const {categoryId, main_page, is_official} = req.body;
+    const {categoryId, main_page, is_official} = req.query;
     console.log(categoryId, main_page, is_official)
     initResponse()
     if(!req.verifiedToken){
@@ -85,7 +85,7 @@ export const getCategoryPaging = async(req,res) =>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
-    const {categoryId, last,isMain, isOfficial} = req.body;
+    const {categoryId, last,isMain, isOfficial} = req.query;
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.error = "없는 카테고리 입니다."
