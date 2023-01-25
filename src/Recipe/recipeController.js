@@ -4,7 +4,7 @@ import fetch from "node-fetch"
 import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList, checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists } from "./recipeProvider";
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
-import { addLikeToRecipe, changeChallengeStatus, deleteRecipe, getSavedInfo, ScrapRecipe } from "./recipeService";
+import { addLikeToRecipe, changeChallengeStatus, deleteRecipe, getSavedInfo, saveStepImgURL, ScrapRecipe } from "./recipeService";
 
 
 export const getCategory = async(req,res) =>{
@@ -13,12 +13,12 @@ export const getCategory = async(req,res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.error = "없는 카테고리 입니다."
-        return res.send(JSON.stringify(baseResponse))
+        return res.json(baseResponse)
     }
     if(main_page==1){
         const getCategoryId = await getMainCategoryID(categoryId)
@@ -26,12 +26,12 @@ export const getCategory = async(req,res) =>{
             baseResponse.success = true;
             baseResponse.data = getCategoryId;
             console.log(baseResponse)
-            return res.send(JSON.stringify(baseResponse))
+            return res.json(baseResponse)
         }
         else{
             baseResponse.success = false
             baseResponse.error = "데이터가 없습니다."
-            return res.send(JSON.stringify(baseResponse))        
+            return res.json(baseResponse)
         }
     }
 
@@ -40,10 +40,10 @@ export const getCategory = async(req,res) =>{
         if(getCategoryId[0]){
             baseResponse.success = true
             baseResponse.data = getCategoryId
-            res.send(baseResponse);
+            res.json(baseResponse);
         }
         else{
-            res.send(JSON.stringify(responseObj))        
+            res.json(responseObj)
         }
     }
         
@@ -55,24 +55,24 @@ export const thumbCategory = async(req, res)=>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {params:{categoryId}} = req;
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.error = "없는 카테고리 입니다."
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
     const getCategoryId = await getThumbCategoryID(categoryId)
     if(getCategoryId[0]){
         baseResponse.success = true
         baseResponse.data = getCategoryId
-        res.send(JSON.stringify(baseResponse));
+        res.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.error = "데이터가 없습니다."
-        res.send(JSON.stringify(responseObj))        
+        res.json(responseObj)
     }
 
 }
@@ -82,36 +82,36 @@ export const getCategoryPaging = async(req,res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {categoryId, last} = req.body;
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.error = "없는 카테고리 입니다."
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
     if(!categoryId){
         baseResponse.success = false
         baseResponse.error = "category 값을 넣어주세요"
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
 
     if(!last){
         baseResponse.success = false
         baseResponse.error = "last 값을 넣어주세요"
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
 
     const getCategoryId = await getCategoryPagingID(categoryId, last)
     if(getCategoryId[0]){
         baseResponse.success = true
         baseResponse.data = getCategoryId
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.error = "데이터가 없습니다"
-        res.send(baseResponse)        
+        res.json(baseResponse)        
     }
 
 }
@@ -122,19 +122,19 @@ export const getAllRecipes = async(req, res)=>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {is_official} = req.body;
     const getRecipes = await getAllRecipesList(is_official)
     if(getRecipes[0]){
         baseResponse.success = true
         baseResponse.data = getRecipes
-        res.send(baseResponse)
+        res.json(baseResponse)
     }
     else{
         baseResponse.success = false
-        baseResponse.error = "데이터기 없습니다"
-        res.send(baseResponse)
+        baseResponse.error = "데이터가 없습니다"
+        res.json(baseResponse)
     }
 
 }
