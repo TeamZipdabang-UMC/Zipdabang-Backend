@@ -96,17 +96,23 @@ export const searchKeywordList = async(connection, keyword, category) =>{
     const splited = keyword.split(" ");
 
     let i=0;
-    let result = new Array(splited.length);
+    // let result = new Array(splited.length);
+    let result = []
     while (i<splited.length) {
         const searchQuery = 
         `
         select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%' and category = '${category}';
         `;
-        const categoryList = await connection.query(searchQuery, splited[i]);
-        console.log(categoryList[0]);
-        result[i]=categoryList[0];
+        const categoryList = await connection.query(searchQuery);
+        // console.log("categoryList",categoryList[0][0]);
+
+        for (let j = 0; j < categoryList[0].length; j++)
+            result.push(categoryList[0][j])
+        // console.log("categoryList", categoryList[0])
+        // result[i] = categoryList[0]
         i=i+1;
 
     }
+    console.log(`search result in ${category}`, result)
     return result;
 }
