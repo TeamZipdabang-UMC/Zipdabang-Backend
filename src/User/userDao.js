@@ -70,21 +70,21 @@ export const selectUserComplete = async(connection, userId) =>{
 }
 
 export const selectAllScrap = async(connection, userId) =>{
-    const selectUserScrapNextQuery = `select scrap.target_recipe as recipeId, recipe.likes as likes, recipe.name from scrap join recipe on scrap.target_recipe = recipe.Id where scrap.owner = ${userId} order by scrap.created_at DESC;`
+    const selectUserScrapNextQuery = `select scrap.target_recipe as recipeId, recipe.likes as likes, image_url as image, recipe.name from scrap join recipe on scrap.target_recipe = recipe.Id where scrap.owner = ${userId} order by scrap.created_at DESC;`
     console.log(selectUserScrapNextQuery)
     const selectResult = await connection.query(selectUserScrapNextQuery)
     return selectResult[0]
 }
 
 export const selectAllChallenging = async(connection, userId) =>{
-    const selectAllChallengingQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes, recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where recipe.owner = ${userId} and challenge.status = 'challenging' order by challenge.created_at;`
+    const selectAllChallengingQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes, image_url as image, recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where challenge.owner = ${userId} and challenge.status = 'challenging' order by challenge.created_at DESC;`
     console.log(selectAllChallengingQuery)
     const selectResult = await connection.query(selectAllChallengingQuery);
     return selectResult[0]
 }
 
 export const selectAllComplete = async(connection, userId) =>{
-    const selectAllCompleteQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes, recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where recipe.owner = ${userId} and challenge.status = 'complete' order by challenge.created_at DESC;`
+    const selectAllCompleteQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes, image_url as image, recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where challenge.owner = ${userId} and challenge.status = 'complete' order by challenge.created_at DESC;`
     console.log(selectAllCompleteQuery)
     const selectResult = await connection.query(selectAllCompleteQuery);
     return selectResult[0]
