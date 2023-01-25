@@ -118,28 +118,28 @@ export const patchComment = async(req, res) =>{
     }
     if (!req.verifiedToken){
         baseResponse.error = 'no token'
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {owner, commentId:target, newBody} = req.body
     const {userId} = req.verifiedToken
 
     if (!owner){
         baseResponse.error = `소유자 아이디를 넘겨주세요`
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
     else if (!target){
         baseResponse.error = `수정 대상 댓글 아이디를 넘겨주세요`
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
     else if (!newBody){
         baseResponse.error = `수정할 내용 넘겨주세요`
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
 
 
     const result = await updateComment(userId, owner, target,newBody,baseResponse);
 
-    res.send(JSON.stringify(result))
+    res.json(result)
 }
 
 export const deleteCommentController = async(req, res) =>{
@@ -150,20 +150,20 @@ export const deleteCommentController = async(req, res) =>{
     }
     if (!req.verifiedToken){
         baseResponse.error = 'no token'
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {owner, commentId:target} = req.body
     const {userId} = req.verifiedToken
 
     if (!owner){
         baseResponse.error = `소유자 아이디를 넘겨주세요`
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
     else if (!target){
         baseResponse.error = `삭제 대상 댓글 아이디를 넘겨주세요`
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
 
     const result = await deleteCommentService(userId, owner, target, baseResponse);
-    res.send(JSON.stringify(result))
+    res.json(result)
 }
