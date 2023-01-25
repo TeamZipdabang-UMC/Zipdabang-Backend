@@ -1,5 +1,3 @@
-import { constants } from "buffer";
-
 export const getnoticeList = async(connection) =>{
 
     const selectNoticeQuery = 
@@ -12,8 +10,7 @@ export const getnoticeList = async(connection) =>{
 export const getnoticeId = async(connection, noticeId) =>{
 
     const selectNoticeIdQuery = 
-    `SELECT title,body, created_at from notification where id=?;`;
-
+    `SELECT title,body from notification where id=?;`;
     
     const getnoticeId = await connection.query(selectNoticeIdQuery, noticeId);
     return getnoticeId[0];
@@ -25,21 +22,5 @@ export const getTosLists = async(connection) =>{
     `SELECT title, body from tos;`;
     
     const result = await connection.query(tosQuery);
-    return result[0];
-}
-
-
-export const postQuestionData = async(connection,userId, email, text) =>{
-    const postQuestionQuery =
-    `insert into question (owner, contact_email, body) values (${userId}, '${email}', '${text}');`;
-    const result = await connection.query(postQuestionQuery);
-    return result;
-}
-
-export const getFaq = async(connection) =>{
-
-    const faqQuery = 
-    `SELECT question.body as question, answer.body as answer from question inner join answer on question.id = answer.target_question;`;
-    const result = await connection.query(faqQuery);
     return result[0];
 }

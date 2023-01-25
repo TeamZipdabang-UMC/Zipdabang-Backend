@@ -1,6 +1,6 @@
 import  express  from "express";
 import { jwtMiddleware } from '../../config/jwtMiddleware';
-import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers } from './recipeController';
+import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers } from './recipeController';
 const recipeRouter = express.Router();
 
 
@@ -10,11 +10,7 @@ recipeRouter.get('/category',jwtMiddleware, getCategory); //
 recipeRouter.get('/category/paging',jwtMiddleware, getCategoryPaging);
 
 // 전체 레시피 출력
-
-recipeRouter.get('/all-view', jwtMiddleware, getAllRecipes)
-recipeRouter.get('/all-view/paging', jwtMiddleware, getAllRecipesPaging)
-// 레시피 검색 
-recipeRouter.get('/search',jwtMiddleware, getSearch);
+recipeRouter.get('/allView', jwtMiddleware, getAllRecipes)
 
 // 레시피 검색 
 recipeRouter.get('/search',jwtMiddleware, getSearch);
