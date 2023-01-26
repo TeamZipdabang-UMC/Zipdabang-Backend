@@ -72,12 +72,14 @@ export const getTos = async(req, res) =>{
     if (gettos[0]){
         baseResponse.success = true
         baseResponse.data = gettos
-        res.send.json(baseResponse)
+        baseResponse.error = null
+        return res.status(200).send.json(baseResponse)
     }
     else{
         baseResponse.success = false
+        baseResponse.data = null
         baseResponse.error = "데이터가 없습니다."
-        res.send.json(baseResponse)
+        return res.status(404).send.json(baseResponse)
     }
 }
 
