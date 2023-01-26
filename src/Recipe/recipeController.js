@@ -189,7 +189,7 @@ export const getAllRecipes = async(req, res)=>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
-    const {is_official} = req.body;
+    const {is_official} = req.query;
     if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
@@ -233,7 +233,7 @@ export const getAllRecipesPaging = async(req,res) =>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
-    const {is_official, last} = req.body;
+    const {is_official, last} = req.query;
     if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
