@@ -1,10 +1,10 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList, checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList, checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists, getLike } from "./recipeProvider";
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
-import { addLikeToRecipe, changeChallengeStatus, deleteRecipe, getSavedInfo, saveStepImgURL, ScrapRecipe } from "./recipeService";
+import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveStepImgURL, ScrapRecipe } from "./recipeService";
 
 
 export const getCategory = async(req,res) =>{
@@ -337,24 +337,41 @@ export const postLike = async(req,res)=>{
         baseResponse.error = 'no token'
         return res.status(401).json(baseResponse)
     }
+    const {userId} = req.verifiedToken
     const {recipeId} = req.params;
-
-    const checkRecipe = await checkRecipeLikes(recipeId)
+    
     if ((await checkRecipeExists(recipeId)).length == 0){
         baseResponse.error = '레시피가 데이터베이스에 없습니다'
         return res.status(404).json(baseResponse)
     }
 
-    const result = await addLikeToRecipe(recipeId);
-    if(result.success){
-        baseResponse.success = true
-        baseResponse.data = {likes : checkRecipe[0].likes + 1}
-        return res.json(baseResponse)
+    const checkRecipe = await checkRecipeLikes(recipeId)
+    const likeExist = await getLike(userId, recipeId)
+    if (likeExist.length > 0){
+        const result = await deleteLiketoRecipe(userId, recipeId)
+        if (result.success){
+            baseResponse.success = true
+            baseResponse.data = {likes : checkRecipe[0].likes - 1}
+            return res.json(baseResponse)
+        }
+        else{
+            baseResponse.error = 'server error'
+            return res.status(500).json(baseResponse)
+        }
     }
     else{
-        baseResponse.error = 'server error'
-        return res.status(500).json(baseResponse)
+        const result = await addLikeToRecipe(userId,recipeId);
+        if(result.success){
+            baseResponse.success = true
+            baseResponse.data = {likes : checkRecipe[0].likes + 1}
+            return res.json(baseResponse)
+        }
+        else{
+            baseResponse.error = 'server error'
+            return res.status(500).json(baseResponse)
+        }
     }
+
 }
 
 export const postScrap = async(req,res)=>{
