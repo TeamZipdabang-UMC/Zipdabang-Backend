@@ -608,7 +608,7 @@ export const getAllOfficail = async(req, res) =>{
     }
 
     let {last} = req.query
-    console.log(last)
+    console.log("last", last)
 
     if(!last)
         last = null

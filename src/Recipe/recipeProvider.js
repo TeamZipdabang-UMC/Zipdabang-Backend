@@ -132,23 +132,27 @@ export const getChallengeStatus = async(userId, recipeId)=>{
 export const checkRecipeLikes = async(recipeId) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectLikes(connection, recipeId);
+    connection.release()
     return result
 }
 
 export const getAllOfficailProvider = async(last) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectAllOficial(connection, last)
+    connection.release()
     return result
 }
 
 export const getAllUsersProvider = async(last) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectAllUsers(connection, last)
+    connection.release()
     return result
 }
 
 export const getLike = async(userId, recipeId) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectLikeByUser(connection, userId, recipeId)
+    connection.release()
     return result
 }

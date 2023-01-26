@@ -392,10 +392,11 @@ export const selectMethods = async(connection, recipeId) =>{
 
 export const selectAllOficial = async(connection, last) =>{
     let sql = ``
-    if (last)
+    if (last != null)
         sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 and created_at < (select created_at from recipe where Id= ${last}) order by created_at desc limit 12;`
     else
         sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 order by created_at desc limit 12;`
+    console.log(sql)
     const result = await connection.query(sql)
     return result[0]
 }
