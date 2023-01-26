@@ -9,9 +9,9 @@ import { baseResponse, initResponse } from '../../config/baseResponse'
 
 
 export const noticeList = async(req, res) => {
-    initResponse;
     if(!req.verifiedToken){
         baseResponse.success = false
+        baseResponse.data = null
         baseResponse.error = "no token"
         return res.status(401).send.json(baseResponse)
     }
@@ -32,9 +32,9 @@ export const noticeList = async(req, res) => {
 }
 
 export const selectnotice = async(req, res) => {
-    initResponse;
     if(!req.verifiedToken){
         baseResponse.success = false
+        baseResponse.data = null
         baseResponse.error = "no token"
         return res.status(401).send.json(baseResponse)
     }
@@ -62,9 +62,9 @@ export const selectnotice = async(req, res) => {
 }
 
 export const getTos = async(req, res) =>{
-    initResponse;
     if(!req.verifiedToken){
         baseResponse.success = false
+        baseResponse.data = null
         baseResponse.error = "no token"
         return res.status(401).send.json(baseResponse)
     }
@@ -84,6 +84,7 @@ export const getTos = async(req, res) =>{
 export const createQuestion = async(req, res) => {
     if(!req.verifiedToken){
         baseResponse.success = false
+        baseResponse.data = null
         baseResponse.error = "no token"
         return res.status(401).send.json(baseResponse)
     }
@@ -126,9 +127,9 @@ export const createQuestion = async(req, res) => {
 
 
 export const getfaq = async(req, res) =>{
-    initResponse;
     if(!req.verifiedToken){
         baseResponse.success = false
+        baseResponse.data = null
         baseResponse.error = "no token"
         return res.status(401).send.json(baseResponse)
     }

@@ -38,7 +38,8 @@ export const postQuestionData = async(connection,userId, email, text) =>{
 export const getFaq = async(connection) =>{
 
     const faqQuery = 
-    `SELECT question.body as question, answer.body as answer from question inner join answer on question.id = answer.target_question;`;
+    //`SELECT question.body as question, answer.body as answer from question inner join answer on question.id = answer.target_question;`;
+    `SELECT question, answer from faq order by created_at desc;`
     const result = await connection.query(faqQuery);
     return result[0];
 }
