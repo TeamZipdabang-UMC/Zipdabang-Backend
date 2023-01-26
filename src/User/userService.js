@@ -34,6 +34,7 @@ export const startWithKakao = async(userEmail, userProfile)=>{
                 email : userEmail,
                 token
             }
+            console.log("after login",responseObj)
             return responseObj
         }
     }
@@ -55,6 +56,7 @@ export const startWithKakao = async(userEmail, userProfile)=>{
             email : userEmail,
             token
         }
+        console.log("after login",responseObj)
         return responseObj
     }
 }
