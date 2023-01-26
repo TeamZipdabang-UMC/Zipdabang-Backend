@@ -113,3 +113,9 @@ export const updateInactive = async(connection, userId) =>{
     const quitResult = await connection.query(quitQuery)
     return quitResult[0].affectedRows
 }
+
+export const selectScrapByUser = async(connection, userId, recipeId) =>{
+    const sql = `select Id from scrap where owner = ${userId} and target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0]
+}

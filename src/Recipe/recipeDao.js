@@ -198,7 +198,6 @@ export const getTempSavedInfos = async(connection, recipeId)=>{
 export const checkRecipeExistsDao = async(connection, recipeId)=>{
     const sql = `select id from recipe where id='${recipeId}';`
     const result = await connection.query(sql);
-    console.log(result[0])
     return result[0];
 }
 
@@ -410,4 +409,28 @@ export const selectAllUsers = async(connection,last) =>{
     const result = await connection.query(sql)
     console.log(result[0])
     return result[0]
+}
+
+export const selectLikeByUser = async(connection, userId, recipeId) =>{
+    const sql = `select Id from likes where owner = ${userId} and target_recipe = ${recipeId};`
+    const selectResult = await connection.query(sql)
+    return selectResult[0]
+}
+
+export const insertLike = async(connection, userId, recipeId) =>{
+    const sql = `insert into likes (owner, target_recipe) values (${userId}, ${recipeId});`
+    const result = await connection.query(sql)
+    return result
+}
+
+export const minusLike = async(connection, userId, recipeId) =>{
+    const sql = `update recipe set likes= likes - 1 where id = '${recipeId}';`
+    const result = connection.query(sql)
+    return result
+}
+
+export const deleteLikes = async(connection, userId, recipeId) =>{
+    const sql = `delete from likes where owner = ${userId} and target_recipe = ${recipeId};`
+    const result = connection.query(sql)
+    return result
 }

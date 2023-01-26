@@ -27,7 +27,7 @@ export const selectCommentJoin = async(connection, target) =>{
 }
 
 export const selectCommentJoinMany = async(connection, target) =>{
-    const selectCommentJoinManyQuery = `select comment.Id as commentId, comment.owner, comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = User.Id where comment.target_recipe = ${target} order by comment.created_at DESC limit 12;`
+    const selectCommentJoinManyQuery = `select comment.Id as commentId, comment.owner, comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} order by comment.created_at DESC limit 12;`
     const selectResult = await connection.query(selectCommentJoinManyQuery);
     return selectResult[0]
 }

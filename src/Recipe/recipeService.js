@@ -1,6 +1,7 @@
 import pool from "../../config/database";
-import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteRecipeDao, insertChallengeTable, insertScrap, selectIngredients, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
-import { checkRecipeExists, getChallengeStatus } from "./recipeProvider";
+import { selectScrapByUser } from "../User/userDao";
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, insertChallengeTable, insertLike, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
+import { checkRecipeExists, getChallengeStatus, getLike } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
 
@@ -109,13 +110,17 @@ export const getSavedInfo = async(userId, recipeId) =>{
     const recipeInfo = await selectRecipeInfo(connection,recipeId);
     const ingredientInfo = await selectIngredients(connection,recipeId);
     const methodInfo = await selectMethods(connection,recipeId);
-    console.log(recipeInfo, ingredientInfo, methodInfo)
+    const liked = await selectLikeByUser(connection, userId, recipeId);
+    const scraped = await selectScrapByUser(connection,userId, recipeId);
+    console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped)
     connection.release();
 
     const dataObj = {
         recipe : recipeInfo,
         ingredient : ingredientInfo,
-        steps : methodInfo
+        steps : methodInfo,
+        liked,
+        scraped
     }
     
     return dataObj
@@ -172,15 +177,14 @@ export const changeChallengeStatus = async(userId, recipeId) =>{
     }
 }
 
-export const addLikeToRecipe = async(recipeId)=>{
+export const addLikeToRecipe = async(userId,recipeId)=>{
     const connection = await pool.getConnection(async conn => conn)
-
-    const result = await updateLikes(connection, recipeId);
-
+    const plusResult = await updateLikes(connection, recipeId);
+    const insertResult = await insertLike(connection, userId, recipeId)
     connection.release();
 
-    console.log(result[0])
-    if(result[0].affectedRows > 0){
+    console.log(plusResult, insertResult)
+    if(plusResult[0].affectedRows > 0 && insertResult[0].affectedRows > 0){
         return {
             success : true
         }
@@ -209,5 +213,24 @@ export const ScrapRecipe = async(userId, recipeId)=>{
         return {
             success : false,
            }
+    }
+}
+
+export const deleteLiketoRecipe = async(userId, recipeId) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    const minusResult = await minusLike(connection,userId, recipeId)
+    const deleteResult = await deleteLikes(connection, userId, recipeId)
+    connection.release()
+
+    console.log(minusResult, deleteResult)
+    if (minusResult[0].affectedRows > 0 && minusResult[0].affectedRows > 0){
+        return {
+            success : true
+        }
+    }
+    else{
+        return{
+            success : false
+        }
     }
 }
