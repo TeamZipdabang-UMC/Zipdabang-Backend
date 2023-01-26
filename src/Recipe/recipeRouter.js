@@ -16,10 +16,6 @@ recipeRouter.get('/all-view/paging', jwtMiddleware, getAllRecipesPaging)
 // 레시피 검색 
 recipeRouter.get('/search',jwtMiddleware, getSearch);
 
-// 레시피 검색 
-recipeRouter.get('/search',jwtMiddleware, getSearch);
-
-
 // recipeRouter.route("/create/user-recipe")
 // .all(jwtMiddleware)
 // .get(getCreateUserRecipe)
