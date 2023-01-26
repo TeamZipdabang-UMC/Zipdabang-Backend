@@ -13,6 +13,7 @@ export const getnoticeId = async(connection, noticeId) =>{
 
     const selectNoticeIdQuery = 
     `SELECT title,body, created_at from notification where id=?;`;
+
     
     const getnoticeId = await connection.query(selectNoticeIdQuery, noticeId);
     return getnoticeId[0];

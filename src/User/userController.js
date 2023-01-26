@@ -134,7 +134,7 @@ export const getMyPage = async(req, res) =>{
     if (!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
 
     const {userId, userEmail} = req.verifiedToken;
@@ -150,7 +150,7 @@ export const getMyPage = async(req, res) =>{
     }
 
     console.log(baseResponse)
-    res.send(JSON.stringify(baseResponse))
+    res.json(baseResponse)
 }
 
 export const getMyScrap = async(req, res) =>{
@@ -164,7 +164,7 @@ export const getMyScrap = async(req, res) =>{
     if (!req.verifiedToken){
         baseResponse.success = false,
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {userId, userEmail} = req.verifiedToken
     const myAllScrap = await getMyScrapAll(userId)
@@ -174,7 +174,7 @@ export const getMyScrap = async(req, res) =>{
         myScrap : myAllScrap
     }
     console.log(baseResponse)
-    res.send(JSON.stringify(baseResponse))
+    res.json(baseResponse)
 }
 
 export const getMyChallenging = async(req, res) => {
@@ -186,7 +186,7 @@ export const getMyChallenging = async(req, res) => {
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {userId, userEmail} = req.verifiedToken
     const myAllChallenging = await getMyChallengingAll(userId)
@@ -196,7 +196,7 @@ export const getMyChallenging = async(req, res) => {
         myChallenging : myAllChallenging
     }
     console.log(baseResponse)
-    res.send(JSON.stringify(baseResponse))
+    res.json(baseResponse)
 }
 
 export const getMyComeplete = async(req, res) =>{
@@ -208,7 +208,7 @@ export const getMyComeplete = async(req, res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {userId, userEmail} = req.verifiedToken
     const myAllComplete = await getMyCompleteAll(userId)
@@ -218,7 +218,7 @@ export const getMyComeplete = async(req, res) =>{
         myComplete : myAllComplete
     }
     console.log(baseResponse)
-    res.send(JSON.stringify(baseResponse))
+    res.json(baseResponse)
 }
 
 export const deleteMyScrap = async(req, res) =>{
@@ -230,7 +230,7 @@ export const deleteMyScrap = async(req, res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {target} = req.body
     const {userId} = req.verifiedToken
@@ -240,18 +240,18 @@ export const deleteMyScrap = async(req, res) =>{
         baseResponse.error = "삭제할 레시피 아이디 보내주세요"
 
         console.log(baseResponse)
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
     const result = await deleteScraps(target,userId)
     if (result > 0){
         baseResponse.success = true
         console.log(baseResponse)
-       return res.send(JSON.stringify(baseResponse))
+       return res.json(baseResponse)
     }
     else{
         baseResponse.success = false
         baseResponse.error = "삭제할 대상이 데이터베이스에 없습니다"
-       return res.status(400).send(JSON.stringify(baseResponse))
+       return res.status(400).json(baseResponse)
     }
 }
 
@@ -264,7 +264,7 @@ export const patchNickname = async(req, res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {nickname} = req.body
     const {userId} = req.verifiedToken
@@ -273,19 +273,19 @@ export const patchNickname = async(req, res) =>{
     if(!nickname){
         baseResponse.success = false
         baseResponse.error = "닉네임 보내주세요"
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
     else if (nickname.length < 2 || nickname.length >= 10){
         baseResponse.success = false
         baseResponse.error = "닉네임은 2 ~ 10 글자"
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
 
     const nicknameCheck = await checkExistNickname(nickname)
     if (nicknameCheck){
         baseResponse.success = false
         baseResponse.error = "닉네임을 누가 이미 사용중입니다"
-        return res.status(400).send(JSON.stringify(baseResponse))
+        return res.status(400).json(baseResponse)
     }
     else{
         const changeResult = await changeNickname(userId,nickname)
@@ -293,7 +293,7 @@ export const patchNickname = async(req, res) =>{
             baseResponse.success = true
 
             console.log(baseResponse)
-            return res.status(200).send(JSON.stringify(baseResponse))
+            return res.status(200).json(baseResponse)
         }
     }
 }
@@ -307,7 +307,7 @@ export const patchUser = async(req, res) =>{
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.error = "no token"
-        return res.status(401).send(JSON.stringify(baseResponse))
+        return res.status(401).json(baseResponse)
     }
     const {userId} = req.verifiedToken
     console.log("in controller", userId)
@@ -318,6 +318,6 @@ export const patchUser = async(req, res) =>{
         baseResponse.success = true
 
         console.log(baseResponse)
-        return res.send(JSON.stringify(baseResponse))
+        return res.json(baseResponse)
     }
 }
