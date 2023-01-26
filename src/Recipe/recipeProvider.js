@@ -1,5 +1,7 @@
 import pool from "../../config/database"
-import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging, selectLikeByUser } from "./recipeDao";
+
+import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser } from "./recipeDao";
+
 
 export const getCategoryID = async(categoryId, is_official)=>{
     const connection = await pool.getConnection(async conn => conn);
@@ -27,6 +29,13 @@ export const getCategoryPagingID = async(categoryId, last, isMain, isOfficial)=>
     if (isMain == 1)
         isOfficial = null
     const result = await getCategoryPagingList(connection, categoryId, last, isOfficial);
+    connection.release();
+    return result
+}
+
+export const getAllViewPaging = async(is_official, last)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await getViewPaging(connection, is_official, last);
     connection.release();
     return result
 }
