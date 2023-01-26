@@ -2,6 +2,7 @@
 export const selectSingleEmail = async(connection, email) =>{
     const selectEmailQuery = `select Id from user where email= '${email}';`
 
+    console.log("in dao", selectEmailQuery)
     const existUserId = await connection.query(selectEmailQuery)
     
     return existUserId[0];
