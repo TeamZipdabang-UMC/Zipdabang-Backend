@@ -17,7 +17,7 @@ export const noticeList = async(req, res) => {
     }
 
     const getNotice = await getNoticeList()
-    if(getNotice){
+    if(getNotice[0]){
         baseResponse.success = true
         baseResponse.data = getNotice
         baseResponse.error = null
@@ -78,7 +78,7 @@ export const getTos = async(req, res) =>{
     else{
         baseResponse.success = false
         baseResponse.data = null
-        baseResponse.error = "데이터가 없습니다."
+        baseResponse.error = "서비스 이용약관 데이터가 없습니다."
         return res.status(404).json(baseResponse)
     }
 }
@@ -98,7 +98,7 @@ export const getquestionList = async(req, res) =>{
         return res.status(400).json(baseResponse)
     }
     const list = await questionList(userId);
-    console.log("list ", list[0])
+    //console.log("list ", list[0])
     if (list[0].length!=0){
         baseResponse.success = true
         baseResponse.data = list[0]
@@ -152,9 +152,9 @@ export const createQuestion = async(req, res) => {
         return res.status(401).json(baseResponse)
     }
     const {userId} = req.verifiedToken;
-    console.log("user token", userId);
+    //console.log("user token", userId);
     const {email, text} = req.body
-    console.log(userId, email, text)
+    //console.log(userId, email, text)
     if(!email){
         baseResponse.success = false
         baseResponse.data = null
