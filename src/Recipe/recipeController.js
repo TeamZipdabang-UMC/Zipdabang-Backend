@@ -2,7 +2,7 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { type } from "os";
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists,checkRecipeLikes, checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike } from "./recipeProvider";
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
 import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveStepImgURL, ScrapRecipe } from "./recipeService";
@@ -325,10 +325,8 @@ export const getSearch = async(req, res)=>{
         baseResponse.error = null
         baseResponse.data = result
         return res.status(200).json(baseResponse)
-
-
-
-
+    }
+}
 export const saveImgURL = async(req,res)=>{
     const {userId} = req.verifiedToken;
     const {file} = req;
