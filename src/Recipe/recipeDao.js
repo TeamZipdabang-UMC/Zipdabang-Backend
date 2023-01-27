@@ -1,3 +1,4 @@
+import { query } from "express";
 
 export const getCategoryList = async(connection, categoryId, is_official) =>{
 
@@ -452,4 +453,10 @@ export const insertRecipe = async(connection, recipe, ingredient, steps) => {
     const recipeSql = ``
 
     ingredient.forEach((i) => console.log(i))
+}
+
+export const getChallenger = async(connection, recipeId) =>{
+    const sql = `select count(*) as challenger from challenge where target_recipe = ${recipeId} and status = 'challenging' or status = 'complete';`
+    const result = await connection.query(sql);
+    return result[0][0].challenger
 }
