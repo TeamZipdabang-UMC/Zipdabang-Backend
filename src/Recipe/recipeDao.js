@@ -258,9 +258,9 @@ export const updateR_InsertCIS = async(connection, recipe, category,ingredients,
     //category, ingredients, steps는 새로 생성
 }
 
-export const insertTempRecipe = async(connection, recipe, category,ingredients)=>{
-    //모든 table을 새로 생성해서 저장
-}
+//export const insertTempRecipe = async(connection, recipe, category,ingredients)=>{
+//    //모든 table을 새로 생성해서 저장
+//}
 
 export const updateRecipeDao = async (connection,recipe, category, ingredients, steps) =>{
     let sql = `update recipe as r set r.name = '${recipe.name}', r.intro = '${recipe.intro}', r.time = '${recipe.time}', r.review='${review}',
@@ -443,13 +443,46 @@ export const selectTempByUser = async(connection, userId) =>{
 }
 
 export const deleteTemp = async(connection, targetId) =>{
-    const sql = `delete from recipe where Id= ${targetId};`
-    const result = await connection.query(sql)
-    return result[0].affectedRows
+    const tempDeleteSql = `delete from temp where target_recipe=${targetId};`
+    const tempDeleteResult = await connection.query(tempDeleteSql)
+
+    const RecipeDeletesql = `delete from recipe where Id= ${targetId};`
+    const recipeDeleteResult = await connection.query(RecipeDeletesql)
+    return { recipeDelete : recipeDeleteResult,
+    tempDelete : tempDeleteResult}
 }
 
-export const insertRecipe = async(connection, recipe, ingredient, steps) => {
-    const recipeSql = ``
+export const insertRecipe = async(connection, userId, recipe, ingredient, steps) => {
+    const recipeSql = `insert into recipe (owner, is_official, category, name, intro, review, take_time, image_url) values (${userId},0,?);`
+    const recipeResult = await connection.query(recipeSql, recipe);
 
-    ingredient.forEach((i) => console.log(i))
+    console.log("레시피 insert 결과 : ", recipeResult[0])
+
+    const getReipceIdSql = `select Id from recipe where owner=${userId} order by created_at desc limit 1;`
+    let newRecipeId = await connection.query(getReipceIdSql);
+    newRecipeId = newRecipeId[0][0].Id
+    console.log("새로 생성된 recipe Id : ", newRecipeId);
+    
+    for(let i of ingredient) {
+        const ingredientSql = `insert into ingredient (target_recipe, name, quantity) values (${newRecipeId}, "${i.name}", "${i.quantity}");`
+        const ingredientResult = await connection.query(ingredientSql);
+        console.log("재료 insert 결과 : ", ingredientResult[0])
+    }
+
+
+    for(let s of steps){
+        const stepSql = `insert into method (target_recipe, step, step_description, step_image_url) values (${newRecipeId}, ${s.step}, "${s.detail}", "${s.step_image_url}");`
+        const stepResult = await connection.query(stepSql);
+        console.log("step insert 결과 : ", stepResult[0]);
+    } 
+    return newRecipeId;
+}
+
+export const insertTempRecipe = async(connection, userId, newRecipeId)=>{
+    const newTempSaveTableSql = `insert into temp (owner, target_recipe) values (${userId}, ${newRecipeId});`
+    const tempSaveResult = await connection.query(newTempSaveTableSql);
+
+    console.log(tempSaveResult);
+
+    return tempSaveResult;
 }

@@ -6,7 +6,7 @@ import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryI
 
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
-import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
+import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveRecipe, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
 
 
 export const getCategory = async(req,res) =>{
@@ -680,8 +680,23 @@ export const postTemp = async(req, res) =>{
 
     const {recipe, ingredient, steps} = req.body
     const {userId} = req.verifiedToken
-    console.log(req.body)
-    const saveInfo = await saveTemp(userId, recipe, ingredient, steps)
+    //console.log(req.body)
+    const saveInfo = await saveRecipe(userId, recipe, ingredient, steps)
+    if(saveInfo.success == true){
+        const saveTempInfo = await saveTemp(userId, saveInfo.newRecipeId)
+        if(saveTempInfo.success == true){
+            baseResponse.success=true
+            return res.json(baseResponse)
+        }
+        else{
+            baseResponse.error = saveTempInfo.error
+            return res.status(500).json(baseResponse)
+        }
+    }
+    else{
+        baseResponse.error = saveInfo.error
+        return res.status(500).json(baseResponse)
+    }
 }
 
 export const postThumPicture = async(req, res) =>{
@@ -704,4 +719,30 @@ export const postStepPicture = async(req, res) =>{
         error : null
     }
     res.json(obj)
+}
+
+export const postSave = async(req,res)=>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).json(baseResponse)
+    }
+
+    const {recipe, ingredient, steps} = req.body
+    const {userId} = req.verifiedToken
+    //console.log(req.body)
+    const saveInfo = await saveRecipe(userId, recipe, ingredient, steps)
+    if(saveInfo.success == true){
+        baseResponse.success=true
+        return res.json(baseResponse)
+
+    }
+    else{
+        baseResponse.error = saveInfo.error
+        return res.status(500).json(baseResponse)
+    }
 }
