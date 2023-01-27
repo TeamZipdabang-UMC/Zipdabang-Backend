@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { getnoticeList,getnoticeId, getTosLists, getFaq } from "./noticeDao";
+import { getnoticeList,getnoticeId, getTosLists, getFaq ,getFaqId,getUserQuestionId,getUserQuestiondetails} from "./noticeDao";
 
 
 export const getNoticeList = async()=>{
@@ -23,9 +23,30 @@ export const getTosList = async()=>{
     return result
 }
 
+export const questionList = async(userId)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await getUserQuestionId(connection, userId);
+    connection.release();
+    return result
+}
+
+export const questiondetails = async(questionId)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await getUserQuestiondetails(connection, questionId);
+    connection.release();
+    return result
+}
 export const getFaqList = async()=>{
     const connection = await pool.getConnection(async conn => conn);
     const result = await getFaq(connection);
+    connection.release();
+    return result
+}
+
+
+export const getFaqListId = async(faqId)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await getFaqId(connection, faqId);
     connection.release();
     return result
 }
