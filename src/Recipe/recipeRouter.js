@@ -49,33 +49,7 @@ recipeRouter.route("/my-recipes")
 recipeRouter.get('/official-recipe',jwtMiddleware,getAllOfficail)
 recipeRouter.get('/user-recipe',jwtMiddleware,getAllUsers)
 
-/*
-recipeRouter.route("/create/official-recipe")
-//.all(공식계정 확인 미들웨어)
-.get(getCreateOfficialRecipe)
-.post(postCreateOfficialRecipe)
-*/
 
-
-
-
-// [
-
-//     data :{
-//         reicpe: {
-//             name,
-//             category <- 
-//             ... 
-//         },
-//         ingredient:{
-//             [{name,qun},{} ... ]
-//         },
-//         steps:{
-//             [{number, detail, stepImg}, {} ...]
-//         }
-//     }
-
-// ]
 
 recipeRouter.route('/temp-recipe').all(jwtMiddleware).get(getTemp).post(postTemp)
 recipeRouter.post('/thumb-picture',jwtMiddleware,tokenCheckPicture,uploadPicture.single("img"),postThumPicture)
