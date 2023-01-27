@@ -25,10 +25,10 @@ export const getCategory = async(req,res) =>{
         baseResponse.error = "없는 카테고리 입니다."
         return res.status(400).json(baseResponse);
     }
-    if(typeof main_page == 'undefined'){
+    if(typeof categoryId == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
-        baseResponse.error = "main page 값이 없습니다."
+        baseResponse.error = "categoryId 없습니다."
         return res.status(400).json(baseResponse);     
     }
     /* 1 or 0 
@@ -39,14 +39,14 @@ export const getCategory = async(req,res) =>{
         return res.status(400).json(baseResponse);     
     }
     */
-    if(typeof is_official == 'undefined'){
+    if(main_page == 0 && typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "is_official 값이 없습니다."
         return res.status(400).json(baseResponse);     
     }
 
-    if(is_official !=0 && is_official != 1 ){
+    if(main_page == 0 &&is_official !=0 && is_official != 1 ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "잘못된 is_official값 입니다."
@@ -130,6 +130,7 @@ export const thumbCategory = async(req, res)=>{
 }
 
 export const getCategoryPaging = async(req,res) =>{
+    initResponse()
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.data = null
@@ -159,9 +160,9 @@ export const getCategoryPaging = async(req,res) =>{
         baseResponse.error = "없는 카테고리 입니다."
         return res.status(400).json(baseResponse);
     }
-    if (typeof isMain == "undefined"){
+    if (isMain == 0 && typeof isOfficial == "undefined"){
         baseResponse.success = false
-        baseResponse.error = "메인페이지 여부를 알려주세요"
+        baseResponse.error = "isOfficial 알려주세요"
         return res.status(400).json(baseResponse)
     }
 
