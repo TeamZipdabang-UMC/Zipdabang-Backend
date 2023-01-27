@@ -90,7 +90,7 @@ export const getquestionList = async(req, res) =>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
-    const {params:{userId}} = req
+    const {userId} = req.verifiedToken
     if(!userId){
         baseResponse.success = false
         baseResponse.data = null

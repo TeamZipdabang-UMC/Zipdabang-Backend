@@ -1,3 +1,4 @@
+import { query } from "express";
 
 export const getCategoryList = async(connection, categoryId, is_official) =>{
 
@@ -483,6 +484,24 @@ export const insertTempRecipe = async(connection, userId, newRecipeId)=>{
     const tempSaveResult = await connection.query(newTempSaveTableSql);
 
     console.log(tempSaveResult);
-
     return tempSaveResult;
+    ingredient.forEach((i) => console.log(i))
 }
+
+export const getChallenger = async(connection, recipeId) =>{
+    const sql = `select count(*) as challenger from challenge where target_recipe = ${recipeId} and status = 'challenging' or status = 'complete';`
+    const result = await connection.query(sql);
+    return result[0][0].challenger
+}
+
+export const getScrap = async(connection, recipeId) =>{
+    const sql = `select count(*) as scraps from scrap where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0][0].scraps
+}
+
+export const getComment = async(connection, recipeId) =>{
+    const sql = `select count(*) as comments from comment where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0][0].comments
+   }

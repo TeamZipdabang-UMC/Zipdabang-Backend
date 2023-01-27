@@ -1,6 +1,7 @@
 import pool from "../../config/database";
 import { selectScrapByUser } from "../User/userDao";
-import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, insertChallengeTable, insertLike, insertRecipe, insertScrap, insertTempRecipe, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
+
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, getComment, getScrap, insertChallengeTable, insertLike, insertRecipe, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
 import { checkRecipeExists, getChallengeStatus, getLike, getTempProvider } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
@@ -110,19 +111,28 @@ export const getSavedInfo = async(userId, recipeId) =>{
     const recipeInfo = await selectRecipeInfo(connection,recipeId);
     const ingredientInfo = await selectIngredients(connection,recipeId);
     const methodInfo = await selectMethods(connection,recipeId);
-    const liked = await selectLikeByUser(connection, userId, recipeId);
-    const scraped = await selectScrapByUser(connection,userId, recipeId);
-    console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped)
+    let liked = await selectLikeByUser(connection, userId, recipeId);
+    let scraped = await selectScrapByUser(connection,userId, recipeId);
+    let challenger = await getChallenger(connection, recipeId);
+    let comments = await getComment(connection, recipeId);
+    let scraps = await getScrap(connection, recipeId);
+    console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped, comments, scraps)
     connection.release();
 
+    liked = liked.length > 0 ? true : false
+    scraped = scraped.length > 0 ? true : false
     const dataObj = {
         recipe : recipeInfo,
         ingredient : ingredientInfo,
         steps : methodInfo,
         liked,
-        scraped
+        scraped,
+        challenger,
+        comments,
+        scraps
     }
     
+    console.log(dataObj)
     return dataObj
 }
 
