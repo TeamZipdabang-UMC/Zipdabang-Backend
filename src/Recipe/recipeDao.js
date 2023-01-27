@@ -454,8 +454,11 @@ export const deleteTemp = async(connection, targetId) =>{
 }
 
 export const insertRecipe = async(connection, userId, recipe, ingredient, steps) => {
-    const recipeSql = `insert into recipe (owner, is_official, category, name, intro, review, take_time, image_url) values (${userId},0,?);`
-    const recipeResult = await connection.query(recipeSql, recipe);
+    const recipeSql = `insert into recipe (owner, is_official, category, name, intro, review, take_time, image_url) values (${userId},0,?,?,?,?,?,?);`
+
+    const {category, name, intro, review, take_time, image_url} = recipe
+    const recipeParam = [category, name, intro, review, take_time, image_url]
+    const recipeResult = await connection.query(recipeSql, recipeParam);
 
     console.log("레시피 insert 결과 : ", recipeResult[0])
 
