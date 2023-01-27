@@ -131,19 +131,17 @@ export const searchKeywordList = async(connection, keyword, category) =>{
         select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%' and category = '${category}';
         `;
 
-        const categoryList = await connection.query(searchQuery, splited[i]);
+        // const categoryList = await connection.query(searchQuery, splited[i]);
         //console.log(categoryList[0]);
-        //result[i]=categoryList[0];
-        result.push(categoryList[0]);
-/* 검색 결과 나중에 테스트 해보기
+        // result[i]=categoryList[0];
+        // result.push(categoryList[0]);
         const categoryList = await connection.query(searchQuery);
-        // console.log("categoryList",categoryList[0][0]);
+        console.log("categoryList",categoryList[0][0]);
 
         for (let j = 0; j < categoryList[0].length; j++)
             result.push(categoryList[0][j])
         // console.log("categoryList", categoryList[0])
         // result[i] = categoryList[0]
-*/
         i=i+1;
         //console.log(result)
 
