@@ -244,14 +244,54 @@ export const deleteLiketoRecipe = async(userId, recipeId) =>{
     }
 }
 
-export const saveTemp = async(userId,recipe, ingredient, steps) =>{
+export const saveRecipe = async(userId,recipe, ingredient, steps) =>{
     const existRecipe = await getTempProvider(userId)
     console.log("in service, check exist", existRecipe)
+
+    const connection = await pool.getConnection(async conn => conn)
     if (existRecipe.length > 0){
         const {target_recipe:targetId} = existRecipe[0]
-        const connection = await pool.getConnection(async conn => conn)
         const deleteResult = await deleteTemp(connection, targetId)
+        if(deleteResult.recipeDelete[0].affectedRows <=0 || deleteResult.tempDelete[0].affectedRows <=0){
+            connection.release()
+            return{
+                success : false,
+                error : "기존 recipe 삭제 실패"
+            }
+        }
     }
 
-    const saveTempTarget = await insertRecipe(recipe, ingredient, steps)
+    const newRecipeId = await insertRecipe(connection, userId, recipe, ingredient, steps)
+
+    connection.release()
+    if(newRecipeId == undefined){
+        return {
+            success : false,
+            error : "레시피 저장 실패"
+        }
+    }
+    else{
+        return{
+            success: true,
+            newRecipeId
+        }
+    }
+}
+
+export const saveTemp = async(userId, newRecipeId)=>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const createTempTable = await insertTempRecipe(connection, userId, newRecipeId);
+    connection.release()
+    if(createTempTable[0].affectedRows > 0){
+        return{
+            success : true
+        }
+    }
+    else{
+        return {
+            success : false,
+            error : "임시저장 실패"
+        }
+    }
 }

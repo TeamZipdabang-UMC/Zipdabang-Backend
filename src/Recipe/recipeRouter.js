@@ -1,7 +1,7 @@
 import  express  from "express";
 import { jwtMiddleware } from '../../config/jwtMiddleware';
 import { tokenAndBodyCheck, tokenCheckPicture, uploadPicture } from "../../config/middlewares";
-import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers, getTemp, postTemp, postThumPicture, postStepPicture } from './recipeController';
+import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers, getTemp, postTemp, postThumPicture, postStepPicture, postSave } from './recipeController';
 const recipeRouter = express.Router();
 
 
@@ -49,6 +49,8 @@ recipeRouter.get('/official-recipe',jwtMiddleware,getAllOfficail)
 recipeRouter.get('/user-recipe',jwtMiddleware,getAllUsers)
 
 
+// ]
+recipeRouter.post('/new-recipe', jwtMiddleware,postSave)
 
 recipeRouter.route('/temp-recipe').all(jwtMiddleware).get(getTemp).post(postTemp)
 recipeRouter.post('/thumb-picture',jwtMiddleware,tokenCheckPicture,uploadPicture.single("img"),postThumPicture)
