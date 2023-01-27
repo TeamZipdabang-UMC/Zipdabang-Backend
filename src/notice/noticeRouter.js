@@ -10,8 +10,8 @@ noticeRouter.get('/:noticeId([0-9]+)',jwtMiddleware, selectnotice);
 noticeRouter.get('/tos',jwtMiddleware, getTos);
 
 noticeRouter.post('/question',jwtMiddleware, createQuestion);
-noticeRouter.get('/questionlist/', jwtMiddleware, getquestionList)
-noticeRouter.get('/questiondetail/', jwtMiddleware, getquestionDetails)
+noticeRouter.get('/questionlist', jwtMiddleware, getquestionList)
+noticeRouter.get('/questiondetail', jwtMiddleware, getquestionDetails)
 
 noticeRouter.get('/faq',jwtMiddleware, getfaq);
 noticeRouter.get('/faq/:faqId',jwtMiddleware, getfaqid);
