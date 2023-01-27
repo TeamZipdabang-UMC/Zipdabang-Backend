@@ -292,18 +292,18 @@ export const getSearch = async(req, res)=>{
 
     let count=0
     const coffeeSearch = await searchKeyword(keyword, 1);
-    if(coffeeSearch[0].length == 0) count+=1
+    if(coffeeSearch.length == 0) count+=1
     const beverageSearch = await searchKeyword(keyword, 2);
-    if(beverageSearch[0].length == 0) count+=1
+    if(beverageSearch.length == 0) count+=1
     //console.log("be ", beverageSearch.length)
     const teaSearch = await searchKeyword(keyword, 3);
-    if(teaSearch[0].length == 0) count+=1
+    if(teaSearch.length == 0) count+=1
     const adeSearch = await searchKeyword(keyword, 4);
-    if(adeSearch[0].length == 0) count+=1
+    if(adeSearch.length == 0) count+=1
     const smoothieSearch = await searchKeyword(keyword, 5);
-    if(smoothieSearch[0].length == 0) count+=1
+    if(smoothieSearch.length == 0) count+=1
     const healthSearch = await searchKeyword(keyword, 6);
-    if(healthSearch[0].length == 0) count+=1
+    if(healthSearch.length == 0) count+=1
     if( count == 6 ){
         baseResponse.success = false
         baseResponse.data = null
