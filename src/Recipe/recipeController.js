@@ -705,4 +705,3 @@ export const postStepPicture = async(req, res) =>{
     }
     res.json(obj)
 }
-

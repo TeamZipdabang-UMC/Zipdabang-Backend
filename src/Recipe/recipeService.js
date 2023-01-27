@@ -1,8 +1,6 @@
 import pool from "../../config/database";
 import { selectScrapByUser } from "../User/userDao";
-import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, insertChallengeTable, insertLike, insertRecipe, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
-
-
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, getComment, getScrap, insertChallengeTable, insertLike, insertRecipe, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
 import { checkRecipeExists, getChallengeStatus, getLike, getTempProvider } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
@@ -115,7 +113,9 @@ export const getSavedInfo = async(userId, recipeId) =>{
     let liked = await selectLikeByUser(connection, userId, recipeId);
     let scraped = await selectScrapByUser(connection,userId, recipeId);
     let challenger = await getChallenger(connection, recipeId);
-    console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped)
+    let comments = await getComment(connection, recipeId);
+    let scraps = await getScrap(connection, recipeId);
+    console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped, comments, scraps)
     connection.release();
 
     liked = liked.length > 0 ? true : false
@@ -126,7 +126,9 @@ export const getSavedInfo = async(userId, recipeId) =>{
         steps : methodInfo,
         liked,
         scraped,
-        challenger
+        challenger,
+        comments,
+        scraps
     }
     
     console.log(dataObj)

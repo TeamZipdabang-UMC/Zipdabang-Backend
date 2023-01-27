@@ -460,3 +460,15 @@ export const getChallenger = async(connection, recipeId) =>{
     const result = await connection.query(sql);
     return result[0][0].challenger
 }
+
+export const getScrap = async(connection, recipeId) =>{
+    const sql = `select count(*) as scraps from scrap where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0][0].scraps
+}
+
+export const getComment = async(connection, recipeId) =>{
+    const sql = `select count(*) as comments from comment where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0][0].comments
+}
