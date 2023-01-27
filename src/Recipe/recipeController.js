@@ -3,6 +3,7 @@ import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { type } from "os";
 import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider } from "./recipeProvider";
+
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
 import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
@@ -189,7 +190,7 @@ export const getAllRecipes = async(req, res)=>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
-    const {is_official} = req.body;
+    const {is_official} = req.query;
     if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
@@ -233,7 +234,7 @@ export const getAllRecipesPaging = async(req,res) =>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
-    const {is_official, last} = req.body;
+    const {is_official, last} = req.query;
     if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
