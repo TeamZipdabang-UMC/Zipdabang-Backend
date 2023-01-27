@@ -1,6 +1,7 @@
 import  express  from "express";
 import { jwtMiddleware } from '../../config/jwtMiddleware';
-import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers } from './recipeController';
+import { tokenAndBodyCheck, tokenCheckPicture, uploadPicture } from "../../config/middlewares";
+import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers, getTemp, postTemp, postThumPicture, postStepPicture } from './recipeController';
 const recipeRouter = express.Router();
 
 
@@ -20,20 +21,8 @@ recipeRouter.get('/search',jwtMiddleware, getSearch);
 recipeRouter.get('/search',jwtMiddleware, getSearch);
 
 
-// recipeRouter.route("/create/user-recipe")
-// .all(jwtMiddleware)
-// .get(getCreateUserRecipe)
-// .post(postCreateUserRecipe);
 
-// recipeRouter.route("/create/user-recipe/temp-save")
-// .all(jwtMiddleware)
-// .get(getTempSaveUserRecipe)
-// .post(postTempSaveUserRecipe);
-
-// recipeRouter.route("/create/save-img/:recipeId([0-9]+)")
-// .post(upload.single("img"), saveImgURL);
-
-recipeRouter.route("/:recipeId([0-9]+)/info")
+recipeRouter.route("/info")
 .all(jwtMiddleware)
 .get(getShowRecipeInfo)
 
@@ -52,11 +41,6 @@ recipeRouter.route("/:recipeId([0-9]+)/scrap")
 recipeRouter.route("/my-recipes/delete")
 .all(jwtMiddleware)
 .post(postDeleteRecipe)
-
-// recipeRouter.route("/:recipeId([0-9]+)/update")
-// .all(jwtMiddleware)
-// .get(getUpdateRecipe)
-// .post(postUpdateRecipe)
 
 recipeRouter.route("/my-recipes")
 .all(jwtMiddleware)
@@ -93,4 +77,7 @@ recipeRouter.route("/create/official-recipe")
 
 // ]
 
+recipeRouter.route('/temp-recipe').all(jwtMiddleware).get(getTemp).post(postTemp)
+recipeRouter.post('/thumb-picture',jwtMiddleware,tokenCheckPicture,uploadPicture.single("img"),postThumPicture)
+recipeRouter.post('/step-picture/:stepNum([0-9]+)', jwtMiddleware, tokenAndBodyCheck, uploadPicture.single("img"),postStepPicture)
 export default recipeRouter

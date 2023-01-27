@@ -435,3 +435,21 @@ export const deleteLikes = async(connection, userId, recipeId) =>{
     const result = connection.query(sql)
     return result
 }
+
+export const selectTempByUser = async(connection, userId) =>{
+    const sql = `select target_recipe from temp where owner = ${userId};`
+    const result = await connection.query(sql)
+    return result[0]
+}
+
+export const deleteTemp = async(connection, targetId) =>{
+    const sql = `delete from recipe where Id= ${targetId};`
+    const result = await connection.query(sql)
+    return result[0].affectedRows
+}
+
+export const insertRecipe = async(connection, recipe, ingredient, steps) => {
+    const recipeSql = ``
+
+    ingredient.forEach((i) => console.log(i))
+}

@@ -2,10 +2,10 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { type } from "os";
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider } from "./recipeProvider";
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
-import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveStepImgURL, ScrapRecipe } from "./recipeService";
+import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
 
 
 export const getCategory = async(req,res) =>{
@@ -389,7 +389,7 @@ export const getShowRecipeInfo = async(req,res) =>{
         return res.status(401).json(baseResponse)
     }
     const {userId} = req.verifiedToken;
-    const {recipeId} = req.params;
+    const {recipe:recipeId} = req.query
 
     if ((await checkRecipeExists(recipeId)).length == 0){
         baseResponse.error = '레시피가 데이터베이스에 없습니다'
@@ -643,4 +643,64 @@ export const getAllUsers = async(req, res) =>{
         console.log(baseResponse)
         return res.json(baseResponse)
     }
+}
+
+export const getTemp = async(req, res) =>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).json(baseResponse)
+    }   
+    const {userId} = req.verifiedToken
+    const tempExist = await getTempProvider(userId)
+    if (tempExist.length == 0){
+        baseResponse.success = true
+        res.json(baseResponse)
+    }
+    else{
+        const {target_recipe:recipeId} = tempExist[0]
+    }
+}
+
+export const postTemp = async(req, res) =>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.status(401).json(baseResponse)
+    }
+
+    const {recipe, ingredient, steps} = req.body
+    const {userId} = req.verifiedToken
+    console.log(req.body)
+    const saveInfo = await saveTemp(userId, recipe, ingredient, steps)
+}
+
+export const postThumPicture = async(req, res) =>{
+    const obj = {
+        success : true,
+        data :{image :  req.file.location},
+        error : null
+    }
+    res.json(obj)
+}
+
+
+export const postStepPicture = async(req, res) =>{
+    const obj = {
+        success : true,
+        data : {
+            image : req.file.location,
+            stepNum : req.params.stepNum
+        },
+        error : null
+    }
+    res.json(obj)
 }

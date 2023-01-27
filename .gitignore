@@ -6,12 +6,12 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+.gitignore
 
 config/privateinfo.js
 config/database.js
 package-lock.json
 .gitignoregkr
-
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.jso1n
 

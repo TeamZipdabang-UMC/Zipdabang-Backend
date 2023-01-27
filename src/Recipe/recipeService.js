@@ -1,7 +1,7 @@
 import pool from "../../config/database";
 import { selectScrapByUser } from "../User/userDao";
-import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, insertChallengeTable, insertLike, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
-import { checkRecipeExists, getChallengeStatus, getLike } from "./recipeProvider";
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, insertChallengeTable, insertLike, insertRecipe, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
+import { checkRecipeExists, getChallengeStatus, getLike, getTempProvider } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
 
@@ -233,4 +233,16 @@ export const deleteLiketoRecipe = async(userId, recipeId) =>{
             success : false
         }
     }
+}
+
+export const saveTemp = async(userId,recipe, ingredient, steps) =>{
+    const existRecipe = await getTempProvider(userId)
+    console.log("in service, check exist", existRecipe)
+    if (existRecipe.length > 0){
+        const {target_recipe:targetId} = existRecipe[0]
+        const connection = await pool.getConnection(async conn => conn)
+        const deleteResult = await deleteTemp(connection, targetId)
+    }
+
+    const saveTempTarget = await insertRecipe(recipe, ingredient, steps)
 }
