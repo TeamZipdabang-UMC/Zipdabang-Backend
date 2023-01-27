@@ -115,11 +115,18 @@ export const getSavedInfo = async(userId, recipeId) =>{
     let challenger = await getChallenger(connection, recipeId);
     let comments = await getComment(connection, recipeId);
     let scraps = await getScrap(connection, recipeId);
-    console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped, comments, scraps)
+    let isChallenge = await getChallengeStatus(userId, recipeId);
+    // console.log(recipeInfo, ingredientInfo, methodInfo, liked, scraped, comments, scraps)
     connection.release();
 
     liked = liked.length > 0 ? true : false
     scraped = scraped.length > 0 ? true : false
+    if (isChallenge.length == 0)
+        isChallenge = 0
+    else if (isChallenge[0].status == "challenging")
+        isChallenge = 1
+    else if (isChallenge[0].status == "complete")
+        isChallenge = 2
     const dataObj = {
         recipe : recipeInfo,
         ingredient : ingredientInfo,
@@ -128,7 +135,8 @@ export const getSavedInfo = async(userId, recipeId) =>{
         scraped,
         challenger,
         comments,
-        scraps
+        scraps,
+        isChallenge
     }
     
     console.log(dataObj)
@@ -150,9 +158,6 @@ export const changeChallengeStatus = async(userId, recipeId) =>{
     else if (challengeStatus[0].status == 'challenging'){
         result = await updateChallengeTable(connection, userId, recipeId);
     }
-    else if (challengeStatus[0].status == 'complete'){
-        result = await deleteChallengeTable(connection, userId, recipeId);
-    }
 
     connection.release();
 
@@ -164,18 +169,9 @@ export const changeChallengeStatus = async(userId, recipeId) =>{
                 data : 'challenging'
             }
         else{
-            switch(challengeStatus[0].status){
-                case 'challenging':
-                    return{
-                        success : true,
-                        data : 'complete'
-                    }
-                    break
-                case 'complete':
-                    return{
-                        success : true,
-                        data : 'clear'
-                    }
+            return{
+                success : true,
+                data : 'complete'
             }
         }
     }
