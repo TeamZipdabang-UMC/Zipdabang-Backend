@@ -20,6 +20,7 @@ recipeRouter.get('/search',jwtMiddleware, getSearch);
 recipeRouter.get('/search',jwtMiddleware, getSearch);
 
 
+
 recipeRouter.route("/info")
 .all(jwtMiddleware)
 .get(getShowRecipeInfo)
