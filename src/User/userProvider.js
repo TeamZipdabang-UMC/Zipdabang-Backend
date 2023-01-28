@@ -17,6 +17,7 @@ export const checkExistNickname = async(nickname) =>{
     console.log("in provider", nickname)
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectUserByNickname(connection, nickname);
+    connection.release()
     return result
 }
 
@@ -31,7 +32,7 @@ export const login = async(email, password) =>{
         }
     }
     const result = await selectPassword(connection, email)
-    
+    connection.release()
     const passwordCheck = await bcrypt.compare(password,result.password)
     if (!passwordCheck){
         return{
@@ -82,17 +83,20 @@ export const getMyCompleteOverView = async(userId) => {
 export const getMyScrapAll = async(userId) => {
     const connection = await pool.getConnection(async conn => conn);
     const result = await selectAllScrap(connection, userId);
+    connection.release()
     return result
 }
 
 export const getMyChallengingAll = async(userId) => {
     const connection = await pool.getConnection(async conn => conn);
     const result = await selectAllChallenging(connection, userId);
+    connection.release()
     return result
 }
 
 export const getMyCompleteAll = async(userId) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectAllComplete(connection, userId)
+    connection.release()
     return result
 }
