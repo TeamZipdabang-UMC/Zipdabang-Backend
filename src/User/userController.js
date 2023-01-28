@@ -232,6 +232,7 @@ export const deleteMyScrap = async(req, res) =>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
+    console.log(req.body)
     const {target} = req.body
     const {userId} = req.verifiedToken
     if (!target || target.length == 0)
@@ -266,6 +267,8 @@ export const patchNickname = async(req, res) =>{
         baseResponse.error = "no token"
         return res.status(401).json(baseResponse)
     }
+
+    console.log(req.body)
     const {nickname} = req.body
     const {userId} = req.verifiedToken
 
