@@ -54,7 +54,7 @@ export const getUserQuestiondetails = async(connection,questionId) =>{
 export const getFaq = async(connection) =>{
 
     const faqQuery = 
-    `SELECT id, question from faq order by created_at desc`;
+    `SELECT id, question, answer from faq order by created_at desc`;
     const result = await connection.query(faqQuery);
     return result[0];
 }
