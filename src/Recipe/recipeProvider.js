@@ -2,7 +2,6 @@ import pool from "../../config/database"
 
 import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser, selectTempByUser, selectLastInserted, selectThumb, selectStepPicture, selectAllMyRecipes } from "./recipeDao";
 
-
 export const getCategoryID = async(categoryId, is_official)=>{
     const connection = await pool.getConnection(async conn => conn);
     const result = await getCategoryList(connection, categoryId, is_official);
