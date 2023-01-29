@@ -536,11 +536,7 @@ export const postDeleteRecipe = async(req,res)=>{
     const {userId} = req.verifiedToken;
     // const {target} = req.params;
     // const {recipeId} = req.params
-    const {owner, target} = req.body
-    if (!owner){
-        baseResponse.error = '레시피 소유자를 보내주세요'
-        return res.status(400).json(baseResponse)
-    }
+    const {target} = req.body
     if (!target || target.length == 0){
         baseResponse.error = '삭제할 레시피 아이디를 보내주세요'
         return res.status(400).json(baseResponse)
