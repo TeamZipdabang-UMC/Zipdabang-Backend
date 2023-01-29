@@ -692,12 +692,12 @@ export const postTemp = async(req, res) =>{
     }
 
     const {userId} = req.verifiedToken
-    const {pictures} = req.body
+    const {thumbnail, steps, step_size} = req.body
+    console.log(thumbnail, steps, step_size)
 
-
-    const thumbSave = await savePictureRecipe(userId, pictures[0])
+    const thumbSave = await savePictureRecipe(userId, thumbnail)
     const catchLast = await catchLastProvider(userId)
-    const stepPictureSave = await savePictureStep(catchLast[0].Id,pictures)
+    const stepPictureSave = await savePictureStep(catchLast[0].Id,steps, step_size)
     if (stepPictureSave > 0){
         const lastResult = await saveTemp(userId,catchLast[0].Id)
         if (lastResult > 0)
@@ -744,8 +744,10 @@ export const postSave = async(req,res)=>{
     const {userId} = req.verifiedToken
     console.log(req.body)
     const saveInfo = await saveRecipe(userId, recipe, ingredient, steps)
+    const newRecipeId = await catchLastProvider(userId)
     if(saveInfo.success == true){
         baseResponse.success=true
+        baseResponse.data = newRecipeId[0].Id
         return res.json(baseResponse)
     }
     else{

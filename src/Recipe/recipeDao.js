@@ -551,3 +551,9 @@ export const selectStepPicture = async(connection, recipeId) =>{
     const result = await connection.query(sql)
     return result[0]
 }
+
+export const selectAllMyRecipes = async(connection, userId) =>{
+    const sql = `select Id as recipeId, name ,likes, image_url as image from recipe where owner = ${userId} order by created_at desc`;
+    const result = await connection.query(sql)
+    return result
+}
