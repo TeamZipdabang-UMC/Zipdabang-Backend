@@ -2,11 +2,11 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { type } from "os";
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider, catchLastProvider, getRecipeThumb, getStepPictures } from "./recipeProvider";
 
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
-import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, saveRecipe, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
+import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, savePictureRecipe, savePictureStep, saveRecipe, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
 
 
 export const getCategory = async(req,res) =>{
@@ -659,12 +659,24 @@ export const getTemp = async(req, res) =>{
     }   
     const {userId} = req.verifiedToken
     const tempExist = await getTempProvider(userId)
+    console.log(tempExist[0].target_recipe)
     if (tempExist.length == 0){
         baseResponse.success = true
         res.json(baseResponse)
     }
     else{
         const {target_recipe:recipeId} = tempExist[0]
+        const data = {
+            thumb : null,
+            stepImg : []
+        }
+        const thumb = await getRecipeThumb(recipeId)
+        data.thumb = thumb[0].image_url
+        const step_pics = await getStepPictures(recipeId)
+        step_pics.forEach((i) => data.stepImg.push(i.image))
+        baseResponse.success = true
+        baseResponse.data = data
+        return res.json(baseResponse)
     }
 }
 
@@ -679,24 +691,20 @@ export const postTemp = async(req, res) =>{
         return res.status(401).json(baseResponse)
     }
 
-    const {recipe, ingredient, steps} = req.body
     const {userId} = req.verifiedToken
-    //console.log(req.body)
-    const saveInfo = await saveRecipe(userId, recipe, ingredient, steps)
-    if(saveInfo.success == true){
-        const saveTempInfo = await saveTemp(userId, saveInfo.newRecipeId)
-        if(saveTempInfo.success == true){
-            baseResponse.success=true
+    const {pictures} = req.body
+
+
+    const thumbSave = await savePictureRecipe(userId, pictures[0])
+    const catchLast = await catchLastProvider(userId)
+    const stepPictureSave = await savePictureStep(catchLast[0].Id,pictures)
+    if (stepPictureSave > 0){
+        const lastResult = await saveTemp(userId,catchLast[0].Id)
+        if (lastResult > 0)
+        {
+            baseResponse.success = true
             return res.json(baseResponse)
         }
-        else{
-            baseResponse.error = saveTempInfo.error
-            return res.status(500).json(baseResponse)
-        }
-    }
-    else{
-        baseResponse.error = saveInfo.error
-        return res.status(500).json(baseResponse)
     }
 }
 
@@ -706,7 +714,7 @@ export const postThumPicture = async(req, res) =>{
         data :{image :  req.file.location},
         error : null
     }
-    res.json(obj)
+    return res.json(obj)
 }
 
 
@@ -715,11 +723,10 @@ export const postStepPicture = async(req, res) =>{
         success : true,
         data : {
             image : req.file.location,
-            stepNum : req.params.stepNum
         },
         error : null
     }
-    res.json(obj)
+    return res.json(obj)
 }
 
 export const postSave = async(req,res)=>{
@@ -735,12 +742,11 @@ export const postSave = async(req,res)=>{
 
     const {recipe, ingredient, steps} = req.body
     const {userId} = req.verifiedToken
-    //console.log(req.body)
+    console.log(req.body)
     const saveInfo = await saveRecipe(userId, recipe, ingredient, steps)
     if(saveInfo.success == true){
         baseResponse.success=true
         return res.json(baseResponse)
-
     }
     else{
         baseResponse.error = saveInfo.error

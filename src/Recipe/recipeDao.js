@@ -454,26 +454,30 @@ export const deleteTemp = async(connection, targetId) =>{
 export const insertRecipe = async(connection, userId, recipe, ingredient, steps) => {
     const recipeSql = `insert into recipe (owner, is_official, category, name, intro, review, take_time, image_url) values (${userId},0,?,?,?,?,?,?);`
 
-    const {category, name, intro, review, take_time, image_url} = recipe
+    const {category, name, intro, review, take_time, image_url, step_size, ingredient_size} = recipe
     const recipeParam = [category, name, intro, review, take_time, image_url]
     const recipeResult = await connection.query(recipeSql, recipeParam);
 
     console.log("레시피 insert 결과 : ", recipeResult[0])
+    console.log("in recipe", recipe)
+    console.log(ingredient)
+    console.log(steps)
 
     const getReipceIdSql = `select Id from recipe where owner=${userId} order by created_at desc limit 1;`
     let newRecipeId = await connection.query(getReipceIdSql);
     newRecipeId = newRecipeId[0][0].Id
     console.log("새로 생성된 recipe Id : ", newRecipeId);
     
-    for(let i of ingredient) {
-        const ingredientSql = `insert into ingredient (target_recipe, name, quantity) values (${newRecipeId}, "${i.name}", "${i.quantity}");`
+    for(let i =0; i < ingredient_size; i++) {
+        const ingredientSql = `insert into ingredient (target_recipe, name, quantity) values (${newRecipeId}, "${ingredient[i].name}", "${ingredient[i].quantity}");`
         const ingredientResult = await connection.query(ingredientSql);
         console.log("재료 insert 결과 : ", ingredientResult[0])
+        console.log('i : ', i)
     }
 
 
-    for(let s of steps){
-        const stepSql = `insert into method (target_recipe, step, step_description, step_image_url) values (${newRecipeId}, ${s.step}, "${s.detail}", "${s.step_image_url}");`
+    for(let s=0; s < step_size; s++){
+        const stepSql = `insert into method (target_recipe, step, step_description, step_image_url) values (${newRecipeId}, ${steps[s].step}, "${steps[s].detail}", "${steps[s].step_image_url}");`
         const stepResult = await connection.query(stepSql);
         console.log("step insert 결과 : ", stepResult[0]);
     } 
@@ -505,4 +509,45 @@ export const getComment = async(connection, recipeId) =>{
     const sql = `select count(*) as comments from comment where target_recipe = ${recipeId};`
     const result = await connection.query(sql)
     return result[0][0].comments
+}
+
+
+export const insertRecipePicture = async(connection, param) =>{
+    const sql = `insert into recipe(owner, is_official, image_url) values (?,0,?);`
+    const result = await connection.query(sql, param)
+    return result[0].affectedRows
+}
+
+export const selectLastInserted = async(connection, userId) =>{
+    const sql = `select Id from recipe where owner = ${userId} order by created_at desc limit 1;`
+    const result = await connection.query(sql)
+    return result[0]
+}
+
+export const saveStepPicture = async(connection,target, step,picture) =>{
+    const sql = `insert into method(target_recipe,step,step_image_url) values (?,?,?);`
+    let param = []
+    param.push(target)
+    param.push(step)
+    param.push(picture)
+    const result = await connection.query(sql,param)
+    return result[0].affectedRows
+}
+
+export const insertTemp = async(connection, userId, target) =>{
+    const sql = `insert into temp(owner, target_recipe) values (${userId},${target});`
+    const result = await connection.query(sql)
+    return result[0].affectedRows
+}
+
+export const selectThumb = async(connection, recipeId) =>{
+    const sql = `select image_url from recipe where Id = ${recipeId};`
+    const result = await  connection.query(sql)
+    return result[0]
+}
+
+export const selectStepPicture = async(connection, recipeId) =>{
+    const sql = `select step_image_url as image from method where target_recipe = ${recipeId};`
+    const result = await connection.query(sql)
+    return result[0]
 }
