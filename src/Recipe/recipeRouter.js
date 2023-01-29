@@ -40,6 +40,11 @@ recipeRouter.route("/my-recipes/delete")
 .all(jwtMiddleware)
 .post(postDeleteRecipe)
 
+// recipeRouter.route("/my-recipes")
+// .all(jwtMiddleware)
+// .get(getMyRecipes)
+
+// 무한 스크롤 제외
 recipeRouter.route("/my-recipes")
 .all(jwtMiddleware)
 .get(getMyRecipes)

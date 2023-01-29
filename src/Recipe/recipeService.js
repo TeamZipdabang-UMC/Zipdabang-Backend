@@ -298,11 +298,11 @@ export const savePictureRecipe = async(userId, thumb) =>{
     return insertResult
 }
 
-export const savePictureStep = async(target, pictures)=>{
+export const savePictureStep = async(target, steps, step_size)=>{
     let result = 0
-    for (let i = 1; i < pictures.length; i++){
+    for (let i = 0; i < step_size; i++){
         const connection = await pool.getConnection(async conn => conn)
-        result += await saveStepPicture(connection,target,i,pictures[i])
+        result += await saveStepPicture(connection,target,i + 1,steps[i].step_image_url)
         connection.release()
     }
     return result
