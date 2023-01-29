@@ -53,5 +53,5 @@ recipeRouter.post('/new-recipe', jwtMiddleware,postSave)
 
 recipeRouter.route('/temp-recipe').all(jwtMiddleware).get(getTemp).post(postTemp)
 recipeRouter.post('/thumb-picture',jwtMiddleware,tokenCheckPicture,uploadPicture.single("img"),postThumPicture)
-recipeRouter.post('/step-picture/:stepNum([0-9]+)', jwtMiddleware, tokenAndBodyCheck, uploadPicture.single("img"),postStepPicture)
+recipeRouter.post('/step-picture', jwtMiddleware, tokenCheckPicture, uploadPicture.single("img"),postStepPicture)
 export default recipeRouter

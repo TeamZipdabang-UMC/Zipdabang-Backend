@@ -1,6 +1,6 @@
 import pool from "../../config/database";
 import { selectScrapByUser } from "../User/userDao";
-import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, getComment, getScrap, insertChallengeTable, insertLike, insertRecipe, insertScrap, minusLike, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, getComment, getScrap, insertChallengeTable, insertLike, insertRecipe, insertRecipePicture, insertScrap, insertTemp, minusLike, saveStepPicture, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
 import { checkRecipeExists, getChallengeStatus, getLike, getTempProvider } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
@@ -274,20 +274,44 @@ export const saveRecipe = async(userId,recipe, ingredient, steps) =>{
     }
 }
 
-export const saveTemp = async(userId, newRecipeId)=>{
-    const connection = await pool.getConnection(async conn => conn)
+export const savePictureRecipe = async(userId, thumb) =>{
+    const existRecipe = await getTempProvider(userId)
+    console.log("in service, check exist", existRecipe)
 
-    const createTempTable = await insertTempRecipe(connection, userId, newRecipeId);
+    const connection = await pool.getConnection(async conn => conn)
+    if (existRecipe.length > 0){
+        const {target_recipe:targetId} = existRecipe[0]
+        const deleteResult = await deleteTemp(connection, targetId)
+        if(deleteResult.recipeDelete[0].affectedRows <=0 || deleteResult.tempDelete[0].affectedRows <=0){
+            connection.release()
+            return{
+                success : false,
+                error : "기존 recipe 삭제 실패"
+            }
+        }
+    }
+    let param = []
+    param.push(userId)
+    param.push(thumb)
+    const insertResult = await insertRecipePicture(connection,param)
     connection.release()
-    if(createTempTable[0].affectedRows > 0){
-        return{
-            success : true
-        }
+    return insertResult
+}
+
+export const savePictureStep = async(target, pictures)=>{
+    let result = 0
+    for (let i = 1; i < pictures.length; i++){
+        const connection = await pool.getConnection(async conn => conn)
+        result += await saveStepPicture(connection,target,i,pictures[i])
+        connection.release()
     }
-    else{
-        return {
-            success : false,
-            error : "임시저장 실패"
-        }
-    }
+    return result
+}
+
+export const saveTemp = async(userId, newRecipeId)=>{
+    console.log(userId, newRecipeId)
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await insertTemp(connection, userId, newRecipeId)
+    connection.release()
+    return result
 }
