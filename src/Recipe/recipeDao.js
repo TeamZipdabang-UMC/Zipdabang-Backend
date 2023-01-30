@@ -128,7 +128,7 @@ export const searchKeywordList = async(connection, keyword, category) =>{
     while (i<splited.length) {
         const searchQuery = 
         `
-        select distinct id, image_url, name, likes from recipe where name like '${splited[i]}%' and category = '${category}';
+        select distinct id, image_url, name, likes from recipe where name like '%${splited[i]}%' and category = '${category}';
         `;
 
         // const categoryList = await connection.query(searchQuery, splited[i]);
