@@ -2,7 +2,7 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { type } from "os";
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider, catchLastProvider, getRecipeThumb, getStepPictures } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider, catchLastProvider, getRecipeThumb, getStepPictures, getStepCount, getStepSize } from "./recipeProvider";
 
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
@@ -177,8 +177,7 @@ export const getCategoryPaging = async(req,res) =>{
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다"
-        return res.status(404).json(baseResponse);     
-
+        return res.status(204).json(baseResponse);     
     }
 
 }
@@ -655,17 +654,20 @@ export const getTemp = async(req, res) =>{
     }   
     const {userId} = req.verifiedToken
     const tempExist = await getTempProvider(userId)
-    console.log(tempExist[0].target_recipe)
+    //console.log(tempExist[0].target_recipe)
     if (tempExist.length == 0){
         baseResponse.success = true
         res.json(baseResponse)
     }
     else{
+        const step_size = await getStepSize(tempExist[0].target_recipe)
         const {target_recipe:recipeId} = tempExist[0]
         const data = {
             thumb : null,
-            stepImg : []
+            step_size,
+            stepImg : [],
         }
+        console.log(step_size)
         const thumb = await getRecipeThumb(recipeId)
         data.thumb = thumb[0].image_url
         const step_pics = await getStepPictures(recipeId)
