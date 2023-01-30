@@ -667,13 +667,15 @@ export const getTemp = async(req, res) =>{
             step_size,
             stepImg : [],
         }
-        console.log(step_size)
+
         const thumb = await getRecipeThumb(recipeId)
         data.thumb = thumb[0].image_url
         const step_pics = await getStepPictures(recipeId)
         step_pics.forEach((i) => data.stepImg.push(i.image))
         baseResponse.success = true
         baseResponse.data = data
+
+        console.log("보내주기 직전 데이터:", baseResponse)
         return res.json(baseResponse)
     }
 }
