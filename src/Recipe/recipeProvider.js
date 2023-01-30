@@ -1,6 +1,6 @@
 import pool from "../../config/database"
 
-import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser, selectTempByUser, selectLastInserted, selectThumb, selectStepPicture, selectAllMyRecipes } from "./recipeDao";
+import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser, selectTempByUser, selectLastInserted, selectThumb, selectStepPicture, selectAllMyRecipes, selectStepSize } from "./recipeDao";
 
 export const getCategoryID = async(categoryId, is_official)=>{
     const connection = await pool.getConnection(async conn => conn);
@@ -157,11 +157,19 @@ export const getLike = async(userId, recipeId) =>{
 }
 
 export const getTempProvider = async(userId) =>{
-    console.log("in provider", userId)
+    console.log("in provider", userId, ", getTempProvider")
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectTempByUser(connection, userId)
     connection.release()
     return result
+}
+
+export const getStepSize = async(targetRecipeId)=>{
+    console.log("in provider, getStepSize")
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectStepSize(connection, targetRecipeId)
+    connection.release()
+    return result[0].step_size
 }
 
 export const catchLastProvider = async(userId) =>{

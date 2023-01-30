@@ -441,6 +441,12 @@ export const selectTempByUser = async(connection, userId) =>{
     return result[0]
 }
 
+export const selectStepSize = async(connection, targetRecipeId)=>{
+    const sql = `select count(*) as step_size from method where target_recipe=${targetRecipeId};`
+    const result = await connection.query(sql)
+    return result[0]
+}
+
 export const deleteTemp = async(connection, targetId) =>{
     const tempDeleteSql = `delete from temp where target_recipe=${targetId};`
     const tempDeleteResult = await connection.query(tempDeleteSql)
