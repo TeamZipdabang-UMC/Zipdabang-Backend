@@ -38,7 +38,7 @@ recipeRouter.route("/:recipeId([0-9]+)/scrap")
 
 recipeRouter.route("/my-recipes/delete")
 .all(jwtMiddleware)
-.post(postDeleteRecipe)
+.delete(postDeleteRecipe)
 
 // recipeRouter.route("/my-recipes")
 // .all(jwtMiddleware)
