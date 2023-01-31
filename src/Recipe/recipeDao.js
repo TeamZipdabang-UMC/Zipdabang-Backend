@@ -31,7 +31,7 @@ export const getMainCategoryList = async(connection, categoryId) =>{
 export const getThumbCategoryList = async(connection, categoryId) =>{
 
     const selectCategorryQuery = 
-    `SELECT recipe.id, beveragecategory.name, recipe.name, image_url as image, likes 
+    `SELECT recipe.id as recipeId, likes, beveragecategory.name,image_url as image, recipe.name  
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     where recipe.category=${categoryId} 
     order by created_at desc
