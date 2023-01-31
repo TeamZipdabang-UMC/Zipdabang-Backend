@@ -139,6 +139,7 @@ export const finishSocialLogin = async(dataObj) =>{
     const dataParam = [name, phoneNum, userAge, nickname, userGender]
     
     const result = insertUserData(connection, dataParam, email)
+    connection.release();
     return result
 }
 
@@ -149,6 +150,7 @@ export const deleteScraps = async(target,userId) =>{
     let deleteSubQuery = target.join(",")
     deleteSubQuery = '(' + deleteSubQuery + ')'
     const result = await deleteScrapRow(connection, deleteSubQuery,userId);
+    connection.release();
     return result
 }
 
@@ -156,6 +158,7 @@ export const changeNickname = async(userId, nickname) =>{
     console.log("in service", userId, nickname)
     const connection = await pool.getConnection(async conn => conn)
     const updateResult = await updateNickname(connection, userId, nickname)
+    connection.release();
     return updateResult
 } 
 
@@ -163,5 +166,6 @@ export const quitUser = async(userId) =>{
     console.log("in service", userId)
     const connection = await pool.getConnection(async conn => conn)
     const patchResult = await updateInactive(connection, userId)
+    connection.release();
     return patchResult
 }
