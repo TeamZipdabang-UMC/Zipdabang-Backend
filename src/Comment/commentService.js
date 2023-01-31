@@ -30,6 +30,7 @@ export const createComment = async(userId, target , body,baseResponse) =>{
         }
     }
     else{
+        connection.release();
         baseResponse.error = "레시피 데이터베이스에 없음"
         return baseResponse
     }
@@ -48,12 +49,14 @@ export const updateComment = async(userId, owner, target,newBody,baseResponse) =
     if (checkResult.length > 0){
         const connection = await pool.getConnection(async conn => conn)
         const updateResult = await updateCommentById(connection,target,newBody)
+        connection.release();
         if (updateResult > 0){
             baseResponse.success = true
             return baseResponse
         }
     }
     else{
+        connection.release();
         baseResponse.error = "수정대상이 디비에 없습니다"
         return baseResponse
     }
@@ -71,12 +74,14 @@ export const deleteCommentService = async(userId, owner, target, baseResponse) =
     if (checkResult.length > 0){
         const connection = await pool.getConnection(async conn => conn)
         const updateResult = await deleteCommentById(connection,target)
+        connection.release();
         if (updateResult > 0){
             baseResponse.success = true
             return baseResponse
         }
     }
     else{
+        connection.release();
         baseResponse.error = `수정 대상이 데이터베이스에 없습니다`
         return baseResponse
     }
