@@ -19,7 +19,7 @@ export const getMainCategoryList = async(connection, categoryId) =>{
     const selectCategorryQuery = 
     `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
-    WHERE recipe.category=?
+    WHERE recipe.category=? and recipe.is_temp != 1
     order by created_at desc
     limit 12
     ;`;
@@ -33,7 +33,7 @@ export const getThumbCategoryList = async(connection, categoryId) =>{
     const selectCategorryQuery = 
     `SELECT recipe.id as recipeId, likes, beveragecategory.name,image_url as image, recipe.name  
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
-    where recipe.category=${categoryId} 
+    where recipe.category=${categoryId} and recipe.is_temp != 1
     order by created_at desc
     limit 2
     ;`;
@@ -48,6 +48,7 @@ export const getCategoryPagingList = async(connection, categoryId, last, isOffic
         `SELECT recipe.id, beveragecategory.name, recipe.name, image_url as image, likes 
         FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
         where recipe.category=${categoryId} and created_at < ( select created_at from recipe where id=${last} )
+        and recipe.is_temp != 1
         order by created_at desc
         limit 12
         ;`;
@@ -128,7 +129,7 @@ export const searchKeywordList = async(connection, keyword, category) =>{
     while (i<splited.length) {
         const searchQuery = 
         `
-        select distinct id, image_url, name, likes from recipe where name like '%${splited[i]}%' and category = '${category}';
+        select distinct id, image_url, name, likes from recipe where is_temp != 1 and name like '%${splited[i]}%' and category = '${category}';
         `;
 
         // const categoryList = await connection.query(searchQuery, splited[i]);
@@ -392,9 +393,9 @@ export const selectMethods = async(connection, recipeId) =>{
 export const selectAllOficial = async(connection, last) =>{
     let sql = ``
     if (last != null)
-        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 and created_at < (select created_at from recipe where Id= ${last}) order by created_at desc limit 12;`
+        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 and is_temp != 1 and created_at < (select created_at from recipe where Id= ${last}) order by created_at desc limit 12;`
     else
-        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 order by created_at desc limit 12;`
+        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 and is_temp != 1 order by created_at desc limit 12;`
     console.log(sql)
     const result = await connection.query(sql)
     return result[0]
@@ -403,9 +404,9 @@ export const selectAllOficial = async(connection, last) =>{
 export const selectAllUsers = async(connection,last) =>{
     let sql = ``
     if (last)
-        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and created_at < (select created_at from recipe where Id = ${last})order by created_at desc limit 12;`
+        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and is_temp != 1 and created_at < (select created_at from recipe where Id = ${last})order by created_at desc limit 12;`
     else
-        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 order by created_at desc limit 12;`
+        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and is_temp != 1 order by created_at desc limit 12;`
     const result = await connection.query(sql)
     console.log(result[0])
     return result[0]
@@ -519,7 +520,7 @@ export const getComment = async(connection, recipeId) =>{
 
 
 export const insertRecipePicture = async(connection, param) =>{
-    const sql = `insert into recipe(owner, is_official, image_url) values (?,0,?);`
+    const sql = `insert into recipe(owner, is_official, image_url, is_temp) values (?,0,?,1);`
     const result = await connection.query(sql, param)
     return result[0].affectedRows
 }
@@ -559,16 +560,7 @@ export const selectStepPicture = async(connection, recipeId) =>{
 }
 
 export const selectAllMyRecipes = async(connection, userId) =>{
-    const target_recipe_sql = `select temp.target_recipe from temp where temp.owner=${userId}`
-    const targetId = await connection.query(target_recipe_sql)
-
-    let sql
-    if(targetId[0].length == 0){
-        sql = `select Id as recipeId, name ,likes, image_url as image from recipe where owner = ${userId} order by created_at desc`;
-    }
-    else{
-        sql = `select Id as recipeId, name ,likes, image_url as image from recipe where owner = ${userId} and Id != ${targetId[0][0].target_recipe} order by created_at desc`;
-    }
+    const sql = `select Id as recipeId, name ,likes, image_url as image from recipe where owner = ${userId} and is_temp != 1 order by created_at desc`;
     const result = await connection.query(sql)
     return result
 }
