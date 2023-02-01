@@ -57,14 +57,14 @@ export const selectUserScrapOverView = async(connection, userId) =>{
 }
 
 export const selectUserChallenging = async(connection, userId) =>{
-    const selectUserChallengingQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes,recipe.image_url as image,  recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where recipe.owner = ${userId} and challenge.status = 'challenging' order by challenge.created_at DESC limit 2;`
+    const selectUserChallengingQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes,recipe.image_url as image,  recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where challenge.owner = ${userId} and challenge.status = 'challenging' order by challenge.created_at DESC limit 2;`
     console.log(selectUserChallengingQuery)
     const selectResult = await connection.query(selectUserChallengingQuery);
     return selectResult[0]
 }
 
 export const selectUserComplete = async(connection, userId) =>{
-    const selectUserCompleteQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes, recipe.image_url as image, recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where recipe.owner = ${userId} and challenge.status = 'complete' order by challenge.created_at DESC limit 2;`
+    const selectUserCompleteQuery = `select challenge.target_recipe as recipeId, recipe.likes as likes, recipe.image_url as image, recipe.name from challenge join recipe on challenge.target_recipe = recipe.Id where challenge.owner = ${userId} and challenge.status = 'complete' order by challenge.created_at DESC limit 2;`
     console.log(selectUserCompleteQuery)
     const selectResult = await connection.query(selectUserCompleteQuery)
     return selectResult[0]
