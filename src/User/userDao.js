@@ -109,7 +109,7 @@ export const updateNickname = async(connection, userId, nickname) =>{
 
 export const updateInactive = async(connection, userId) =>{
     console.log("in dao" , userId)
-    const quitQuery = `update user set status = 'INACTIVE' where Id = ${userId};`
+    const quitQuery = `delete from user where Id = ${userId};`
     console.log(quitQuery)
     const quitResult = await connection.query(quitQuery)
     return quitResult[0].affectedRows
