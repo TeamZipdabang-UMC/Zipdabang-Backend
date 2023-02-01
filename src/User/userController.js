@@ -138,6 +138,8 @@ export const getMyPage = async(req, res) =>{
     }
 
     const {userId, userEmail} = req.verifiedToken;
+
+    console.log("내 집다방 페이지 토큰", userId)
     const myScrapResult = await getMyScrapOverView(userId);
     const myChallengingResult = await getMyChallengingOverView(userId);
     const myCompleteResponse = await getMyCompleteOverView(userId);
@@ -167,6 +169,8 @@ export const getMyScrap = async(req, res) =>{
         return res.status(401).json(baseResponse)
     }
     const {userId, userEmail} = req.verifiedToken
+
+    console.log("내 스크랩 조회 토큰")
     const myAllScrap = await getMyScrapAll(userId)
     
     baseResponse.success = true
@@ -189,6 +193,7 @@ export const getMyChallenging = async(req, res) => {
         return res.status(401).json(baseResponse)
     }
     const {userId, userEmail} = req.verifiedToken
+    console.log("내 도전중 토큰",userId);
     const myAllChallenging = await getMyChallengingAll(userId)
 
     baseResponse.success = true
@@ -211,6 +216,8 @@ export const getMyComeplete = async(req, res) =>{
         return res.status(401).json(baseResponse)
     }
     const {userId, userEmail} = req.verifiedToken
+
+    console.log("내 도전완료 페이지 토큰", userId)
     const myAllComplete = await getMyCompleteAll(userId)
 
     baseResponse.success = true

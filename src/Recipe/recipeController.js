@@ -742,7 +742,7 @@ export const postSave = async(req,res)=>{
 
     const {recipe, ingredient, steps} = req.body
     const {userId} = req.verifiedToken
-    console.log(req.body)
+    console.log("레시피 작성 토큰",userId)
     const saveInfo = await saveRecipe(userId, recipe, ingredient, steps)
     const newRecipeId = await catchLastProvider(userId)
     if(saveInfo.success == true){
