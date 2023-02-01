@@ -15,6 +15,9 @@ export const enterMain = async(req, res)=>{
         return res.status(401).json(baseResponse)
     }
     const {userId} = req.verifiedToken;
+
+
+    console.log("메인 페이지 토큰", userId)
     const myScrapResult = await getMyScrapOverView(userId);
     let count=0
     const coffeeCategoryOverView = await getThumbCategoryID(1);
