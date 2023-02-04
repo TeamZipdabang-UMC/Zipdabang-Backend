@@ -501,7 +501,7 @@ export const insertTempRecipe = async(connection, userId, newRecipeId)=>{
 }
 
 export const getChallenger = async(connection, recipeId) =>{
-    const sql = `select count(*) as challenger from challenge where target_recipe = ${recipeId} and status = 'challenging' or status = 'complete';`
+    const sql = `select count(*) as challenger from challenge where target_recipe =  ${recipeId} and (status = 'challenging' or status = 'complete');`
     const result = await connection.query(sql);
     return result[0][0].challenger
 }

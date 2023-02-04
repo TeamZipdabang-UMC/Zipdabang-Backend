@@ -1,7 +1,7 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import { changeNickname, deleteScraps, finishSocialLogin, quitUser, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap } from "./userProvider";
+import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap, getUserInfoProvider } from "./userProvider";
 
 
 export const kakaoLogin = async(req, res) =>{
@@ -329,5 +329,31 @@ export const patchUser = async(req, res) =>{
 
         console.log(baseResponse)
         return res.json(baseResponse)
+    }
+}
+
+export const getUserInfo = async(req,res) =>{
+    let baseResponse = {
+        success : null,
+        data : null,
+        error :null
+    }
+    if(!req.verifiedToken){
+        baseResponse.success = false
+        baseResponse.error = "no token"
+        return res.status(401).json(baseResponse)
+    }
+    const {userId} = req.verifiedToken
+    try{
+        const result = await getUserInfoProvider(userId);
+        baseResponse.success = true;
+        if (result.length > 0)
+            baseResponse.data = result[0]
+        res.json(baseResponse)
+    }catch(e){
+        baseResponse.success = false;
+        baseResponse.error = `server error, the error type: ${e.name}, the error detail : ${e.message}`;
+        console.dir(e)
+        res.json(baseResponse);
     }
 }

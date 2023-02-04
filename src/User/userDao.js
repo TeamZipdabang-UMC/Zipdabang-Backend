@@ -120,3 +120,9 @@ export const selectScrapByUser = async(connection, userId, recipeId) =>{
     const result = await connection.query(sql)
     return result[0]
 }
+
+export const selectUserInfo = async(connection, userId) =>{
+    const sql = `select nickname, email from user where Id = ${userId};`
+    const result = await connection.query(sql);
+    return result[0]
+}
