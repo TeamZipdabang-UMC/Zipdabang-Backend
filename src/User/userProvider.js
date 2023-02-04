@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { selectAllChallenging, selectAllComplete, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
+import { selectAllChallenging, selectAllComplete, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserInfo, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo"
@@ -97,6 +97,13 @@ export const getMyChallengingAll = async(userId) => {
 export const getMyCompleteAll = async(userId) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectAllComplete(connection, userId)
+    connection.release()
+    return result
+}
+
+export const getUserInfoProvider = async(userId) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await selectUserInfo(connection, userId);
     connection.release()
     return result
 }
