@@ -44,6 +44,7 @@ export const getCommentsOverView = async(req, res) =>{
         baseResponse.error = 'no token'
         return res.status(401).json(baseResponse)
     }
+    const {userId} = req.verifiedToken
     const {recipe:target} = req.query
 
     if(!target){
@@ -51,7 +52,7 @@ export const getCommentsOverView = async(req, res) =>{
         return res.status(400).json(baseResponse)
     }
     console.log("controller", target)
-    const result = await commentsOverView(target)
+    const result = await commentsOverView(target, userId)
 
     baseResponse.success = true
     baseResponse.data = {
@@ -70,6 +71,7 @@ export const getCommentsFirst = async(req, res) =>{
         baseResponse.error = 'no token'
         return res.status(401).json(baseResponse)
     }
+    const {userId} = req.verifiedToken
     const {recipe:target} = req.query
 
     if(!target){
@@ -77,7 +79,7 @@ export const getCommentsFirst = async(req, res) =>{
         return res.status(400).json(baseResponse)
     }
     console.log("controller", target)
-    const result = await commentsViewFirst(target)
+    const result = await commentsViewFirst(target, userId)
 
     baseResponse.data = {
         comments : result
@@ -96,12 +98,13 @@ export const getCommentsMore = async(req, res) =>{
         baseResponse.error = 'no token'
         return res.status(401).json(baseResponse)
     }
+    const {userId} = req.verifiedToken
     const {recipe:target, last} =  req.query
     if (!target || !last){
         baseResponse.error = "레시피 아이디 혹은 마지막 댓글 아이디 주세여"
         return res.status(400).json(baseResponse)
     }
-    const result = await commentsViewMore(target, last)
+    const result = await commentsViewMore(target, last, userId)
 
     baseResponse.data = {
         comments : result

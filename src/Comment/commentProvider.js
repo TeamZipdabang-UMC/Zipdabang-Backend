@@ -9,23 +9,23 @@ export const checkRecipeExist = async(target) => {
     return existResult
 }
 
-export const commentsOverView = async(target) =>{
+export const commentsOverView = async(target, userId) =>{
     const connection = await pool.getConnection(async conn => conn)
-    const result = await selectCommentJoin(connection, target)
+    const result = await selectCommentJoin(connection, target, userId)
     connection.release()
     return result
 }
 
-export const commentsViewFirst = async(target) =>{
+export const commentsViewFirst = async(target, userId) =>{
     const connection = await pool.getConnection(async conn => conn)
-    const result = await selectCommentJoinMany(connection, target)
+    const result = await selectCommentJoinMany(connection, target, userId)
     connection.release()
     return result
 }
 
-export const commentsViewMore = async(target, last) =>{
+export const commentsViewMore = async(target, last,userId) =>{
     const connection =  await pool.getConnection(async conn => conn)
-    const result = await selectCommentJoinManyMore(connection, target, last)
+    const result = await selectCommentJoinManyMore(connection, target, last, userId)
     connection.release()
     return result
 }

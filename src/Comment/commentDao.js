@@ -20,20 +20,20 @@ export const selectRecipeById = async(connection, target) =>{
     return selectResult[0]
 }
 
-export const selectCommentJoin = async(connection, target) =>{
-    const selectCommentJoinQuery = `select comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} order by comment.created_at DESC  limit 3;`
+export const selectCommentJoin = async(connection, target, userId) =>{
+    const selectCommentJoinQuery = `select comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} and comment.Id not in (select blocked from banned_comment where owner = ${userId}) and comment.owner not in (select blocked from blocked_user where owner=${userId}) order by comment.created_at DESC  limit 3;`
     const selectResult = await connection.query(selectCommentJoinQuery);
     return selectResult[0]
 }
 
-export const selectCommentJoinMany = async(connection, target) =>{
-    const selectCommentJoinManyQuery = `select comment.Id as commentId, comment.owner, comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} order by comment.created_at DESC limit 12;`
+export const selectCommentJoinMany = async(connection, target, userId) =>{
+    const selectCommentJoinManyQuery = `select comment.Id as commentId, comment.owner, comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} and comment.Id not in (select blocked from banned_comment where owner = ${userId}) and comment.owner not in (select blocked from blocked_user where owner=${userId}) order by comment.created_at DESC limit 12;`
     const selectResult = await connection.query(selectCommentJoinManyQuery);
     return selectResult[0]
 }
 
-export const selectCommentJoinManyMore = async(connection, target, last) =>{
-    const selectCommentJoinManyMoreQuery = `select comment.Id as commentId, comment.owner, comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} and comment.created_at < (select comment.created_at from comment where Id = ${last}) order by comment.created_at DESC limit 12;`
+export const selectCommentJoinManyMore = async(connection, target, last, userId) =>{
+    const selectCommentJoinManyMoreQuery = `select comment.Id as commentId, comment.owner, comment.body, comment.created_at, user.nickname, user.profile_url as profile from comment inner join user on comment.owner = user.Id where comment.target_recipe = ${target} and comment.Id not in (select blocked from banned_comment where owner = ${userId}) and comment.owner not in (select blocked from blocked_user where owner=${userId}) and comment.created_at < (select comment.created_at from comment where Id = ${last}) order by comment.created_at DESC limit 12;`
     const selectResult = await connection.query(selectCommentJoinManyMoreQuery);
     return selectResult[0]
 }
