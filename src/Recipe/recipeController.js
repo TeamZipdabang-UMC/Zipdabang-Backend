@@ -6,12 +6,13 @@ import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryI
 
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
-import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, savePictureRecipe, savePictureStep, saveRecipe, saveStepImgURL, saveTemp, ScrapRecipe } from "./recipeService";
+import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, savePictureRecipe, savePictureStep, saveRecipe, saveStepImgURL, saveTemp, ScrapRecipe, reportRecipeService, banRecipeService } from "./recipeService";
 
 
 export const getCategory = async(req,res) =>{
     const {categoryId, main_page, is_official} = req.query;
-    console.log(categoryId, main_page, is_official)
+    const {userId} = req.verifiedToken
+    console.log(categoryId, main_page, is_official,userId)
     initResponse()
     if(!req.verifiedToken){
         baseResponse.success = false
@@ -54,7 +55,7 @@ export const getCategory = async(req,res) =>{
     }
 
     if(main_page==1){
-        const getCategoryId = await getMainCategoryID(categoryId)
+        const getCategoryId = await getMainCategoryID(categoryId,userId)
         console.log("체크해보자 ", getCategoryId)
         if(getCategoryId[0]){
             baseResponse.success = true;
@@ -73,7 +74,7 @@ export const getCategory = async(req,res) =>{
     }
 
     else{
-        const getCategoryId = await getCategoryID(categoryId, is_official)
+        const getCategoryId = await getCategoryID(categoryId, is_official,userId)
         if(getCategoryId[0]){
             baseResponse.success = true
             baseResponse.data = getCategoryId
@@ -90,6 +91,55 @@ export const getCategory = async(req,res) =>{
         
 }
 
+export const reportRecipe = async(req, res)=>{
+    if(!req.verifiedToken){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "no token"
+        return res.status(401).json(baseResponse)
+    }
+    const { target, crime } = req.body
+    const {userId} = req.verifiedToken
+    const repoter = userId
+    console.log(userId, target, crime)
+    if(!target){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "target 값이 없습니다."
+        return res.status(400).json(baseResponse);     
+    }
+    if(!crime){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "crime 값이 없습니다."
+        return res.status(400).json(baseResponse);     
+    }
+    const reportRecipeResult = await reportRecipeService(repoter, target, crime)
+    console.log("report result ", reportRecipeResult)
+    return res.status(200).json(reportRecipeResult)
+}
+
+export const banRecipe = async(req, res)=>{
+    if(!req.verifiedToken){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "no token"
+        return res.status(401).json(baseResponse)
+    }
+    const { blocked } = req.body
+    const {userId} = req.verifiedToken
+    const owner = userId
+    console.log(owner, blocked)
+    if(!blocked){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "blocked 값이 없습니다."
+        return res.status(400).json(baseResponse);     
+    }
+    const banRecipeResult = await banRecipeService(owner, blocked)
+    console.log("blocked result ", banRecipeResult)
+    return res.status(200).json(banRecipeResult)
+}
 
 export const thumbCategory = async(req, res)=>{
     if(!req.verifiedToken){
@@ -112,8 +162,8 @@ export const thumbCategory = async(req, res)=>{
         return res.status(400).json(baseResponse);
 
     }
-
-    const getCategoryId = await getThumbCategoryID(categoryId)
+    const {userId} = req.verifiedToken
+    const getCategoryId = await getThumbCategoryID(categoryId,userId)
     if(getCategoryId[0]){
         baseResponse.success = true
         baseResponse.data = getCategoryId
@@ -138,6 +188,7 @@ export const getCategoryPaging = async(req,res) =>{
         return res.status(401).json(baseResponse)
     }
     const {categoryId, last,isMain, isOfficial} = req.query;
+    const {userId} = req.verifiedToken
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false
         baseResponse.error = "없는 카테고리 입니다."
@@ -166,7 +217,7 @@ export const getCategoryPaging = async(req,res) =>{
         return res.status(400).json(baseResponse)
     }
 
-    const getCategoryId = await getCategoryPagingID(categoryId, last, isMain, isOfficial)
+    const getCategoryId = await getCategoryPagingID(categoryId, last, isMain, isOfficial,userId)
     if(getCategoryId[0]){
         baseResponse.success = true
         baseResponse.data = getCategoryId
@@ -191,6 +242,7 @@ export const getAllRecipes = async(req, res)=>{
         return res.status(401).json(baseResponse)
     }
     const {is_official} = req.query;
+    const {userId} = req.verifiedToken
     if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
@@ -206,13 +258,12 @@ export const getAllRecipes = async(req, res)=>{
         return res.status(400).json(baseResponse);
     }
     
-    const getRecipes = await getAllRecipesList(is_official)
+    const getRecipes = await getAllRecipesList(is_official,userId)
     //console.log("check!! ", getRecipes[0])
     //if(getRecipes[0]) console.log("반응");
     if(getRecipes[0]){
         baseResponse.success = true
         baseResponse.data = getRecipes
-
         baseResponse.error = null
         return res.status(200).json(baseResponse);
     }
@@ -235,6 +286,7 @@ export const getAllRecipesPaging = async(req,res) =>{
         return res.status(401).json(baseResponse)
     }
     const {is_official, last} = req.query;
+    const {userId} = req.verifiedToken
     if(typeof is_official == 'undefined'){
         baseResponse.success = false
         baseResponse.data = null
@@ -256,7 +308,7 @@ export const getAllRecipesPaging = async(req,res) =>{
     }
 
 
-    const getAllViewPagingData = await getAllViewPaging(is_official, last)
+    const getAllViewPagingData = await getAllViewPaging(is_official, last,userId)
 
     if(getCategoryId[0]){
         baseResponse.success = true
@@ -277,6 +329,7 @@ export const getAllRecipesPaging = async(req,res) =>{
 
 export const getSearch = async(req, res)=>{
     const {keyword} = req.query;
+    const {userId} = req.verifiedToken
     if(!req.verifiedToken){
         baseResponse.success = false
         baseResponse.data = null
@@ -291,27 +344,25 @@ export const getSearch = async(req, res)=>{
     }
 
     let count=0
-    const coffeeSearch = await searchKeyword(keyword, 1);
+    const coffeeSearch = await searchKeyword(keyword, 1,userId);
     if(coffeeSearch.length == 0) count+=1
-    const beverageSearch = await searchKeyword(keyword, 2);
+    const beverageSearch = await searchKeyword(keyword, 2,userId);
     if(beverageSearch.length == 0) count+=1
     //console.log("be ", beverageSearch.length)
-    const teaSearch = await searchKeyword(keyword, 3);
+    const teaSearch = await searchKeyword(keyword, 3,userId);
     if(teaSearch.length == 0) count+=1
-    const adeSearch = await searchKeyword(keyword, 4);
+    const adeSearch = await searchKeyword(keyword, 4,userId);
     if(adeSearch.length == 0) count+=1
-    const smoothieSearch = await searchKeyword(keyword, 5);
+    const smoothieSearch = await searchKeyword(keyword, 5,userId);
     if(smoothieSearch.length == 0) count+=1
-    const healthSearch = await searchKeyword(keyword, 6);
+    const healthSearch = await searchKeyword(keyword, 6,userId);
     if(healthSearch.length == 0) count+=1
     if( count == 6 ){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "데이터가 없습니다."
         return res.status(400).json(baseResponse)
-         
     }
-
     const result = {
         coffeeSearch : coffeeSearch,
         beverageSearch : beverageSearch,
@@ -605,11 +656,12 @@ export const getAllOfficail = async(req, res) =>{
     }
 
     let {last} = req.query
+    const {userId} = req.verifiedToken
     console.log("last", last)
 
     if(!last)
         last = null
-    const result = await getAllOfficailProvider(last)
+    const result = await getAllOfficailProvider(last,userId)
     if(result){
         baseResponse.success = true
         baseResponse.data = result
@@ -629,11 +681,12 @@ export const getAllUsers = async(req, res) =>{
     }   
 
     let {last} = req.query
+    const {userId} = req.verifiedToken
     console.log(last)
 
     if (!last)
         last = null
-    const result = await getAllUsersProvider(last)
+    const result = await getAllUsersProvider(last,userId)
     if (result){
         baseResponse.success = true,
         baseResponse.data = result
