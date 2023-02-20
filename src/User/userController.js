@@ -1,8 +1,8 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import { changeNickname, deleteScraps, finishSocialLogin, quitUser, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap, getUserInfoProvider } from "./userProvider";
-
+import { checkExistEmail, checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap, getUserInfoProvider, getUserNicknameProvider } from "./userProvider";
+import jwt from "jsonwebtoken"
 
 export const kakaoLogin = async(req, res) =>{
     const {userEmail, userProfile} = req.body
@@ -45,7 +45,7 @@ export const postUserDataSocial = async(req,res) =>{
 
     const responseObj = {
         success : null,
-        user : null,
+        data : null,
         error :null
     }
 
@@ -107,19 +107,26 @@ export const postUserDataSocial = async(req,res) =>{
     }
 
     const dataObj = req.body
-    const result = finishSocialLogin(dataObj);
+    const result = await finishSocialLogin(dataObj);
     if (result)
     {
+        const addedUser = await checkExistEmail(email);
+        let token = await jwt.sign({
+            userId : addedUser[0].Id,
+            userEmail : email,
+        },
+        privateInfo.JWT_SECRET,
+        {
+            expiresIn : "30d",
+            subject : "userInfo"
+        });
+        
 
         responseObj.success = true,
-        responseObj.user = {
-            name : dataObj.name,
-            nickname : dataObj.nickname,
-            phoneNum : dataObj.phoneNum
-        }
+        responseObj.data = token
 
         console.log(responseObj)
-        return res.send(JSON.stringify(responseObj));
+        return res.json(responseObj);
     }
 }
 
