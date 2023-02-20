@@ -1,6 +1,6 @@
 import { checkExistEmail } from "./userProvider"
 import pool from "../../config/database"
-import { createUserEmail, deleteScrapRow, insertNewUser, insertUserData, updateInactive, updateNickname } from "./userDao";
+import { blockUserDao, createUserEmail, deleteScrapRow, insertNewUser, insertUserData, reportUserDao, updateInactive, updateNickname } from "./userDao";
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo";
 import bcrypt from "bcrypt"
@@ -144,3 +144,17 @@ export const quitUser = async(userId) =>{
     connection.release();
     return patchResult
 }
+
+export const blockUser = async(block,userId) =>{
+    console.log(block, userId)
+    const connection = await pool.getConnection(async conn => conn)
+    const postResult = await blockUserDao(connection,userId,block)
+    return postResult
+}
+
+export const reportUser = async(reporter,outlaw, target_recipe, target_comment, crime) =>{
+    console.log(reporter, target_recipe, target_comment)
+    const connection = await pool.getConnection(async conn => conn)
+    const postResult = await reportUserDao(connection,reporter,outlaw,target_recipe,target_comment,crime)
+    return postResult
+}   

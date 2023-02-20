@@ -1,6 +1,6 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
-import { changeNickname, deleteScraps, finishSocialLogin, quitUser, startWithGoogle, startWithKakao } from "./userService";
+import { blockUser, changeNickname, deleteScraps, finishSocialLogin, quitUser, reportUser, startWithGoogle, startWithKakao } from "./userService";
 import { checkExistEmail, checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap, getUserInfoProvider, getUserNicknameProvider } from "./userProvider";
 import jwt from "jsonwebtoken"
 
@@ -362,5 +362,76 @@ export const getUserInfo = async(req,res) =>{
         baseResponse.error = `server error, the error type: ${e.name}, the error detail : ${e.message}`;
         console.dir(e)
         res.json(baseResponse);
+    }
+}
+
+export const postBlock = async(req,res) =>{
+    let baseResponse = {
+        success : null,
+        data : null,
+        error :null
+    }
+    if(!req.verifiedToken){
+        baseResponse.success = false
+        baseResponse.error = "no token"
+        return res.status(401).json(baseResponse)
+    }
+    const {userId,userEmail} = req.verifiedToken
+    const {block} = req.body
+
+    if (!block){
+        baseResponse.success = false
+        baseResponse.error = "no blocked user"
+        return res.status(400).json(baseResponse)
+    }
+
+    console.log(block)
+
+    try{
+        const result = await blockUser(block,userId)
+        if (result){
+            baseResponse.success = true
+            res.json(baseResponse)
+        }
+    }catch(e){
+        console.log(e)
+        baseResponse.success = false
+        baseResponse.error = e.message
+        res.status(500).json(baseResponse)
+    }
+}
+
+export const postReportUser = async(req,res) =>{
+    let baseResponse = {
+        success : null,
+        data : null,
+        error :null
+    }
+    if(!req.verifiedToken){
+        baseResponse.success = false
+        baseResponse.error = "no token"
+        return res.status(401).json(baseResponse)
+    }
+
+    const {outlaw, target_comment, target_recipe, crime} = req.body
+    const {userId:reporter} = req.verifiedToken
+    console.log(req.body)
+    if (!outlaw || typeof target_comment == 'undefined' || typeof target_recipe == 'undefined' || typeof crime == 'undefined'){
+        baseResponse.success = false
+        baseResponse.error = "no parameter"
+        return res.status(400).json(baseResponse)
+    }
+
+    try{
+        const result = await reportUser(reporter,outlaw,target_recipe,target_comment,crime)
+        if (result){
+            baseResponse.success = true
+            return res.json(baseResponse)
+        }
+    }catch(e){
+        console.log(e)
+        baseResponse.success = false
+        baseResponse.error = e
+        return res.status(500).json(baseResponse)
     }
 }

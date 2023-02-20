@@ -1,6 +1,6 @@
 import express from 'express'
 import { jwtMiddleware } from '../../config/jwtMiddleware';
-import { deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  getUserInfo,  googleLogin, kakaoLogin,  patchNickname,  patchUser,  postUserDataSocial } from './userController';
+import { blockUser, deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  getUserInfo,  googleLogin, kakaoLogin,  patchNickname,  patchUser,  postBlock,  postReportUser,  postUserDataSocial } from './userController';
 
 const userRouter = express.Router();
 
@@ -30,4 +30,9 @@ userRouter.patch('/my-page/new-nickname',jwtMiddleware,patchNickname)
 //회원탈퇴
 userRouter.patch('/my-page/quit',jwtMiddleware,patchUser)
 
+// 차단하기
+userRouter.post('/block',jwtMiddleware,postBlock)
+
+//신고하기
+userRouter.post('/report',jwtMiddleware,postReportUser)
 export default userRouter
