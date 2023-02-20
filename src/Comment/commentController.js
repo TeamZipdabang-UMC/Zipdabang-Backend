@@ -1,5 +1,6 @@
+import { json } from "express"
 import { commentsOverView, commentsViewFirst, commentsViewMore } from "./commentProvider"
-import { createComment, deleteCommentService, updateComment } from "./commentService"
+import { addCommentBan, addCommentReport, createComment, deleteCommentService, updateComment } from "./commentService"
 
 
 export const newComment = async(req, res) => {
@@ -166,4 +167,52 @@ export const deleteCommentController = async(req, res) =>{
 
     const result = await deleteCommentService(userId, owner, target, baseResponse);
     res.json(result)
+}
+
+export const reportComment = async(req,res)=>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.json(baseResponse)
+    }
+    const {userId : reporter} = req.verifiedToken
+    const {target, crime} = req.body;
+
+    if (!target){
+        baseResponse.error = `신고 대상 댓글 아이디를 넘겨주세요`
+        return res.status(400).json(baseResponse)
+    }
+    else if (!crime){
+        baseResponse.error = `신고 내용을 알려주세요`
+        return res.status(400).json(baseResponse)
+    }
+
+    const result = await addCommentReport(reporter, target, crime, baseResponse)
+    return res.json(result)
+}
+
+export const blockComment = async(req,res)=>{
+    let baseResponse = {
+        success : false,
+        data : null,
+        error : null
+    }
+    if (!req.verifiedToken){
+        baseResponse.error = 'no token'
+        return res.json(baseResponse)
+    }
+    const {userId : owner} = req.verifiedToken
+    const {blocked} = req.body;
+
+    if (!blocked){
+        baseResponse.error = `차단 대상 댓글 아이디를 넘겨주세요`
+        return res.status(400).json(baseResponse)
+    }
+
+    const result = await addCommentBan(owner, blocked, baseResponse)
+    return res.json(result)
 }

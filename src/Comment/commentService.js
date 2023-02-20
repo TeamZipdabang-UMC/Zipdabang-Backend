@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { deleteCommentById, insertComment, selectInsertedCommentId, updateCommentById } from "./commentDao"
+import { deleteCommentById, insertBannedComment, insertComment, insertReportedComment, selectInsertedCommentId, updateCommentById } from "./commentDao"
 import { checkCommentExist, checkRecipeExist } from "./commentProvider"
 
 
@@ -83,6 +83,54 @@ export const deleteCommentService = async(userId, owner, target, baseResponse) =
     else{
         connection.release();
         baseResponse.error = `수정 대상이 데이터베이스에 없습니다`
+        return baseResponse
+    }
+}
+
+export const addCommentReport= async(reporter, target, crime, baseResponse)=>{
+    const checkResult = await checkCommentExist(target);
+
+    if (checkResult.length > 0){
+        const insertParam = [reporter, target,crime]
+
+        const connection = await pool.getConnection(async conn => conn)
+        const result = await insertReportedComment(connection, insertParam)
+        connection.release();
+        if (result > 0){
+            baseResponse.success = true
+            return baseResponse
+        }
+        else{
+            baseResponse.error = `데이터베이스에 정보를 추가하지 못했습니다.(서버오류)`
+            return baseResponse
+        }
+    }
+    else{
+        baseResponse.error = `신고 대상이 데이터베이스에 없습니다`
+        return baseResponse
+    }
+}
+
+export const addCommentBan = async(owner, blocked, baseResponse)=>{
+    const checkResult = await checkCommentExist(blocked);
+
+    if (checkResult.length > 0){
+        const insertParam = [owner, blocked]
+
+        const connection = await pool.getConnection(async conn => conn)
+        const result = await insertBannedComment(connection, insertParam)
+        connection.release();
+        if (result > 0){
+            baseResponse.success = true
+            return baseResponse
+        }
+        else{
+            baseResponse.error = `데이터베이스에 정보를 추가하지 못했습니다.(서버오류)`
+            return baseResponse
+        }
+    }
+    else{
+        baseResponse.error = `차단 대상이 데이터베이스에 없습니다`
         return baseResponse
     }
 }
