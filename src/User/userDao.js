@@ -126,3 +126,19 @@ export const selectUserInfo = async(connection, userId) =>{
     const result = await connection.query(sql);
     return result[0]
 }
+
+export const blockUserDao = async(connection, userId, block) =>{
+    const sql = `insert into blocked_user(owner, blocked) values (${userId}, ${block});`
+    const result = await connection.query(sql)
+    return result[0].affectedRows
+}
+
+export const reportUserDao = async(connection, reporter, outlaw,target_recipe, target_comment, crime) =>{
+    let sql
+    if (target_recipe == null)
+        sql = `insert into reported_user(reporter, outlaw, crime, target_comment) values (${reporter},${outlaw},${crime},${target_comment});`
+    else if (target_comment == null)
+        sql = `insert into reported_user(reporter, outlaw,crime, target_recipe) values(${reporter},${outlaw},${crime},${target_recipe});`
+    const result = await connection.query(sql)
+    return result[0].affectedRows
+}
