@@ -55,3 +55,15 @@ export const deleteCommentById = async(connection, target) =>{
     const updateResult = await connection.query(deleteCommentQuery)
     return updateResult[0].affectedRows
 }
+
+export const insertReportedComment= async(connection, insertParam)=>{
+    const query = `insert into reported_comment(reporter, target, crime) value (?,?,?);`
+    const insertResult = await connection.query(query, insertParam)
+    return insertResult[0].affectedRows
+}
+
+export const insertBannedComment = async(connection, insertParam)=>{
+    const query = `insert into banned_comment(owner, blocked) value (?,?);`
+    const insertResult = await connection.query(query, insertParam)
+    return insertResult[0].affectedRows
+}

@@ -1,6 +1,6 @@
 import express from "express"
 import { jwtMiddleware } from "../../config/jwtMiddleware";
-import {  deleteCommentController, getCommentsFirst, getCommentsMore, getCommentsOverView, newComment, patchComment } from "./commentController";
+import {  blockComment, deleteCommentController, getCommentsFirst, getCommentsMore, getCommentsOverView, newComment, patchComment, reportComment } from "./commentController";
 
 
 const commentRouter = express.Router()
@@ -11,4 +11,6 @@ commentRouter.get('/comments-view-first', jwtMiddleware,getCommentsFirst)
 commentRouter.get('/comments-view-more', jwtMiddleware, getCommentsMore)
 commentRouter.patch('/comments-update', jwtMiddleware, patchComment)
 commentRouter.delete('/comments-delete',jwtMiddleware, deleteCommentController)
+commentRouter.post('/report',jwtMiddleware, reportComment);
+commentRouter.post('/block',jwtMiddleware, blockComment)
 export default commentRouter;
