@@ -17,7 +17,7 @@ export const getMainCategoryID = async(categoryId,userId)=>{
     return result
 }
 
-export const getThumbCategoryID = async(categoryId)=>{
+export const getThumbCategoryID = async(categoryId,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
     const result = await getThumbCategoryList(connection, categoryId,userId);
     connection.release();
@@ -136,7 +136,7 @@ export const checkRecipeLikes = async(recipeId) =>{
     return result
 }
 
-export const getAllOfficailProvider = async(last) =>{
+export const getAllOfficailProvider = async(last,userId) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectAllOficial(connection, last,userId)
     connection.release()
