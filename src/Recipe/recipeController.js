@@ -188,6 +188,7 @@ export const getCategoryPaging = async(req,res) =>{
         return res.status(401).json(baseResponse)
     }
     const {categoryId, last,isMain, isOfficial} = req.query;
+    console.log(categoryId, last, isMain, isOfficial)
     const {userId} = req.verifiedToken
     if(categoryId<1 || 6<categoryId ){
         baseResponse.success = false

@@ -382,8 +382,7 @@ export const insertScrap = async(connection, userId,recipeId) =>{
 }
 
 export const selectChallenge = async(connection,userId, recipeId) =>{
-    const sql = `select status from challenge where owner = ${userId} and target_recipe = ${recipeId}
-    and recipe.id not in (select blocked from banned_recipe where owner =${userId});`
+    const sql = `select status from challenge where owner = ${userId} and target_recipe = ${recipeId};`
     const selectResult = await connection.query(sql)
     return selectResult[0]
 }
@@ -396,7 +395,7 @@ export const selectLikes = async(connection, recipeId) =>{
 }
 
 export const selectRecipeInfo = async(connection, recipeId) =>{
-    const sql = `select Id as recipeId, owner,name, image_url, likes, created_at, intro, take_time, review from recipe where Id = ${recipeId};`
+    const sql = `select u.nickname, recipe.Id as recipeId, owner,recipe.name, image_url, likes, recipe.created_at, intro, take_time, review from recipe inner join user u on recipe.owner = u.Id where recipe.Id = ${recipeId};`
     const result = await connection.query(sql)
     return result[0]
 }
