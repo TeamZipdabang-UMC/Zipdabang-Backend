@@ -1,6 +1,6 @@
 import pool from "../../config/database";
 import { selectScrapByUser } from "../User/userDao";
-import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, getComment, getScrap, insertChallengeTable, insertLike, insertRecipe, insertRecipePicture, insertScrap, insertTemp, minusLike, saveStepPicture, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL } from "./recipeDao";
+import { checkStepExists, createRecipeForThumb, createStepForImg, deleteChallengeTable, deleteLikes, deleteRecipeDao, deleteTemp, getChallenger, getComment, getScrap, insertChallengeTable, insertLike, insertRecipe, insertRecipePicture, insertScrap, insertTemp, minusLike, saveStepPicture, selectIngredients, selectLikeByUser, selectMethods, selectRecipeInfo, updateChallengeTable, updateLikes, updateRecipeDao, updateStepURL, updateThumbURL, reportRecipeDao, banRecipeDao } from "./recipeDao";
 import { checkRecipeExists, getChallengeStatus, getLike, getTempProvider } from "./recipeProvider";
 
 export const saveThumbURL = async(userId, recipeId, dest)=>{
@@ -58,7 +58,21 @@ export const saveStepImgURL = async(recipeId, step, dest)=>{
 }
 
 
+export const reportRecipeService = async(repoter, target, crime)=>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result  = reportRecipeDao(connection,repoter, target, crime);
 
+    connection.release();
+    return result
+}
+
+export const banRecipeService = async(owner, blocked)=>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result  = banRecipeDao(connection,owner, blocked);
+
+    connection.release();
+    return result
+}
 export const updateRecipe = async(userId, recipe, category, ingredients, steps)=>{
     const connection = await pool.getConnection(async conn => conn)
 
