@@ -20,17 +20,17 @@ export const enterMain = async(req, res)=>{
     console.log("메인 페이지 토큰", userId)
     const myScrapResult = await getMyScrapOverView(userId);
     let count=0
-    const coffeeCategoryOverView = await getThumbCategoryID(1);
+    const coffeeCategoryOverView = await getThumbCategoryID(1,userId);
     if(typeof coffeeCategoryOverView[0] == 'undefined') count+=1
-    const beverageCategoryOverView = await getThumbCategoryID(2);
+    const beverageCategoryOverView = await getThumbCategoryID(2,userId);
     if(typeof beverageCategoryOverView[0] == 'undefined') count+=1
-    const teaCategoryOverView = await getThumbCategoryID(3);
+    const teaCategoryOverView = await getThumbCategoryID(3,userId);
     if(typeof teaCategoryOverView[0] == 'undefined') count+=1
-    const adeCategoryOverView = await getThumbCategoryID(4);
+    const adeCategoryOverView = await getThumbCategoryID(4,userId);
     if(typeof adeCategoryOverView[0] == 'undefined') count+=1
-    const smoothieCategoryOverView = await getThumbCategoryID(5);
+    const smoothieCategoryOverView = await getThumbCategoryID(5,userId);
     if(typeof smoothieCategoryOverView[0] == 'undefined') count+=1
-    const healthCategoryOverView = await getThumbCategoryID(6);
+    const healthCategoryOverView = await getThumbCategoryID(6,userId);
 
     if(typeof healthCategoryOverView[0] == 'undefined') count+=1
     console.log(count)
