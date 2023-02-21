@@ -3,52 +3,52 @@ import pool from "../../config/database"
 
 import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser, selectTempByUser, selectLastInserted, selectThumb, selectStepPicture, selectAllMyRecipes, selectStepSize } from "./recipeDao";
 
-export const getCategoryID = async(categoryId, is_official)=>{
+export const getCategoryID = async(categoryId, is_official,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await getCategoryList(connection, categoryId, is_official);
+    const result = await getCategoryList(connection, categoryId, is_official,userId);
     connection.release();
     return result
 }
 
-export const getMainCategoryID = async(categoryId)=>{
+export const getMainCategoryID = async(categoryId,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await getMainCategoryList(connection, categoryId);
+    const result = await getMainCategoryList(connection, categoryId,userId);
     connection.release();
     return result
 }
 
-export const getThumbCategoryID = async(categoryId)=>{
+export const getThumbCategoryID = async(categoryId,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await getThumbCategoryList(connection, categoryId);
+    const result = await getThumbCategoryList(connection, categoryId,userId);
     connection.release();
     return result
 }
 
-export const getCategoryPagingID = async(categoryId, last, isMain, isOfficial)=>{
+export const getCategoryPagingID = async(categoryId, last, isMain, isOfficial,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
     if (isMain == 1)
         isOfficial = null
-    const result = await getCategoryPagingList(connection, categoryId, last, isOfficial);
+    const result = await getCategoryPagingList(connection, categoryId, last, isOfficial,userId);
     connection.release();
     return result
 }
 
-export const getAllViewPaging = async(is_official, last)=>{
+export const getAllViewPaging = async(is_official, last,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await getViewPaging(connection, is_official, last);
+    const result = await getViewPaging(connection, is_official, last,userId);
     connection.release();
     return result
 }
 
-export const getAllRecipesList = async(is_official)=>{
+export const getAllRecipesList = async(is_official,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await getRecipesList(connection, is_official);
+    const result = await getRecipesList(connection, is_official,userId);
     connection.release();
     return result
 }
-export const searchKeyword = async(keyword, category)=>{
+export const searchKeyword = async(keyword, category,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
-    const result = await searchKeywordList(connection, keyword, category);
+    const result = await searchKeywordList(connection, keyword, category,userId);
     connection.release();
     return result
 }
@@ -136,16 +136,16 @@ export const checkRecipeLikes = async(recipeId) =>{
     return result
 }
 
-export const getAllOfficailProvider = async(last) =>{
+export const getAllOfficailProvider = async(last,userId) =>{
     const connection = await pool.getConnection(async conn => conn)
-    const result = await selectAllOficial(connection, last)
+    const result = await selectAllOficial(connection, last,userId)
     connection.release()
     return result
 }
 
-export const getAllUsersProvider = async(last) =>{
+export const getAllUsersProvider = async(last,userId) =>{
     const connection = await pool.getConnection(async conn => conn)
-    const result = await selectAllUsers(connection, last)
+    const result = await selectAllUsers(connection, last,userId)
     connection.release()
     return result
 }

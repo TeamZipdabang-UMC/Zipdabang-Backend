@@ -1,7 +1,7 @@
 import  express  from "express";
 import { jwtMiddleware } from '../../config/jwtMiddleware';
 import { tokenAndBodyCheck, tokenCheckPicture, uploadPicture } from "../../config/middlewares";
-import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers, getTemp, postTemp, postThumPicture, postStepPicture, postSave } from './recipeController';
+import { getCategory, thumbCategory,getCategoryPaging, getSearch, getAllRecipes,getAllRecipesPaging, postDeleteRecipe, getShowRecipeInfo, postStartChallenge, postLike, postScrap, getMyRecipes, getAllOfficail, getAllUsers, getTemp, postTemp, postThumPicture, postStepPicture, postSave, reportRecipe,banRecipe } from './recipeController';
 const recipeRouter = express.Router();
 
 
@@ -18,7 +18,10 @@ recipeRouter.get('/all-view/paging', jwtMiddleware, getAllRecipesPaging)
 recipeRouter.get('/search',jwtMiddleware, getSearch);
 
 
-
+//레시피 신고
+recipeRouter.post('/report', jwtMiddleware, reportRecipe)
+//레시피 차단
+recipeRouter.post('/block', jwtMiddleware, banRecipe)
 
 recipeRouter.route("/info")
 .all(jwtMiddleware)
