@@ -706,7 +706,6 @@ export const getAllOfficail = async(req, res) =>{
 
     let {last} = req.query
     const {userId} = req.verifiedToken
-    console.log("111111111111");
     console.log("last", last)
     console.log(userId)
     if(!last)

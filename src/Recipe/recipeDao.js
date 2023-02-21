@@ -5,7 +5,9 @@ export const getCategoryList = async(connection, categoryId, is_official,userId)
     const selectCategorryQuery = 
     `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
-    WHERE recipe.category=${categoryId} and is_official = ${is_official} and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    WHERE recipe.category=${categoryId} and is_official = ${is_official} 
+    and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    and recipe.owner not in (select blocked from blocked_user where owner=${userId})
     order by created_at desc
     limit 12
     ;`;
@@ -19,7 +21,9 @@ export const getMainCategoryList = async(connection, categoryId,userId) =>{
     const selectCategorryQuery = 
     `SELECT recipe.Id, beveragecategory.name, recipe.name, image_url as image, likes 
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
-    WHERE recipe.category=? and recipe.is_temp != 1 and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    WHERE recipe.category=? and recipe.is_temp != 1 
+    and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    and recipe.owner not in (select blocked from blocked_user where owner=${userId})
     order by created_at desc
     limit 12
     ;`;
@@ -33,7 +37,9 @@ export const getThumbCategoryList = async(connection, categoryId,userId) =>{
     const selectCategorryQuery = 
     `SELECT recipe.id as recipeId, likes, beveragecategory.name,image_url as image, recipe.name  
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
-    where recipe.category=${categoryId} and recipe.is_temp != 1 and recipe.id not in (select blocked from banned_recipe where owner =${userId} )
+    where recipe.category=${categoryId} and recipe.is_temp != 1 
+    and recipe.id not in (select blocked from banned_recipe where owner =${userId} )
+    and recipe.owner not in (select blocked from blocked_user where owner= ${userId} )
     order by created_at desc
     limit 2
     ;`;
@@ -51,6 +57,7 @@ export const getCategoryPagingList = async(connection, categoryId, last, isOffic
         and created_at < ( select created_at from recipe where id=${last} )
         and recipe.is_temp != 1 
         and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+        and recipe.owner not in (select blocked from blocked_user where owner=${userId})
         order by created_at desc
         limit 12
         ;`;
@@ -63,6 +70,7 @@ export const getCategoryPagingList = async(connection, categoryId, last, isOffic
     and recipe.is_official = ${isOfficial} 
     and created_at < ( select created_at from recipe where id=${last} ) 
     and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    and recipe.owner not in (select blocked from blocked_user where owner=${userId})
     order by created_at desc
     limit 12
     ;`;
@@ -78,6 +86,7 @@ export const getRecipesList = async(connection, is_official,userId) =>{
     from recipe inner join beveragecategory on recipe.category = beveragecategory.id
     WHERE recipe.is_official = ?
     and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    and recipe.owner not in (select blocked from blocked_user where owner=${userId})
     order by created_at desc
     limit 12
     ;`;
@@ -93,6 +102,7 @@ export const getViewPaging = async(connection, is_official, last,userId) =>{
     FROM recipe inner join beveragecategory on recipe.category = beveragecategory.id
     where recipe.is_official=${is_official} and created_at < ( select created_at from recipe where id=${last} )
     and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+    and recipe.owner not in (select blocked from blocked_user where owner=${userId})
     order by created_at desc
     limit 12
     ;`;
@@ -149,7 +159,8 @@ export const searchKeywordList = async(connection, keyword, category,userId) =>{
         where is_temp != 1 
         and name like '%${splited[i]}%' 
         and category = '${category}'
-        and recipe.id not in (select blocked from banned_recipe where owner =${userId});
+        and recipe.id not in (select blocked from banned_recipe where owner =${userId})
+        and recipe.owner not in (select blocked from blocked_user where owner=${userId});
 
         `
 
@@ -416,10 +427,13 @@ export const selectAllOficial = async(connection, last,userId) =>{
     let sql = ``
     if (last != null)
         sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 and is_temp != 1 and created_at < (select created_at from recipe where Id= ${last}) 
-        and recipe.id not in (select blocked from banned_recipe where owner =${userId}) order by created_at desc limit 12;`
+        and recipe.id not in (select blocked from banned_recipe where owner =${userId}) 
+        and recipe.owner not in (select blocked from blocked_user where owner=${userId})
+        order by created_at desc limit 12;`
     else
         sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 1 and is_temp != 1 and recipe.id not in (select blocked from banned_recipe where owner =${userId})
-         order by created_at desc limit 12;`
+        and recipe.owner not in (select blocked from blocked_user where owner=${userId})
+        order by created_at desc limit 12;`
     console.log(sql)
     const result = await connection.query(sql)
     return result[0]
@@ -428,9 +442,15 @@ export const selectAllOficial = async(connection, last,userId) =>{
 export const selectAllUsers = async(connection,last,userId) =>{
     let sql = ``
     if (last)
-        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and is_temp != 1 and created_at < (select created_at from recipe where Id = ${last}) and recipe.Id not in (select blocked from banned_recipe where owner =${userId}) order by created_at desc limit 12;`
+        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and is_temp != 1 and created_at < (select created_at from recipe where Id = ${last}) 
+        and recipe.Id not in (select blocked from banned_recipe where owner =${userId}) 
+        and recipe.owner not in (select blocked from blocked_user where owner=${userId})
+        order by created_at desc limit 12;`
     else
-        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and is_temp != 1 and recipe.Id not in (select blocked from banned_recipe where owner =${userId}) order by created_at desc limit 12;`
+        sql = `select Id as recipeId, likes, image_url, name from recipe where is_official = 0 and is_temp != 1 
+        and recipe.Id not in (select blocked from banned_recipe where owner =${userId}) 
+        and recipe.owner not in (select blocked from blocked_user where owner=${userId})
+        order by created_at desc limit 12;`
     const result = await connection.query(sql)
     console.log(result[0])
     return result[0]
