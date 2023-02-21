@@ -2,11 +2,12 @@ import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import fetch from "node-fetch"
 import { type } from "os";
-import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider, catchLastProvider, getRecipeThumb, getStepPictures, getStepCount, getStepSize } from "./recipeProvider";
+import { getCategoryID, getThumbCategoryID,getCategoryPagingID, getMainCategoryID, searchKeyword,getAllRecipesList,getAllViewPaging,checkRecipeExists, checkRecipeLikes, MyRecipeList, getAllOfficailProvider, getAllUsersProvider, checkUserExists,getLike, getTempProvider, catchLastProvider, getRecipeThumb, getStepPictures, getStepCount, getStepSize,checkExistCrime } from "./recipeProvider";
 
 import { json } from "express";
 import { baseResponse, initResponse } from '../../config/baseResponse'
 import { addLikeToRecipe, changeChallengeStatus, deleteLiketoRecipe, deleteRecipe, getSavedInfo, savePictureRecipe, savePictureStep, saveRecipe, saveStepImgURL, saveTemp, ScrapRecipe, reportRecipeService, banRecipeService } from "./recipeService";
+import { constants } from "buffer";
 
 
 export const getCategory = async(req,res) =>{
@@ -114,9 +115,36 @@ export const reportRecipe = async(req, res)=>{
         baseResponse.error = "crime 값이 없습니다."
         return res.status(400).json(baseResponse);     
     }
-    const reportRecipeResult = await reportRecipeService(repoter, target, crime)
-    console.log("report result ", reportRecipeResult)
-    return res.status(200).json(reportRecipeResult)
+    const crimeExistCheck = await checkExistCrime(crime)
+    const existCheck = await checkRecipeExists(target)
+    if(typeof crimeExistCheck[0] =='undefined'){
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "신고 사유가 데이터베이스에 없습니다."
+        return res.status(404).json(baseResponse);   
+    }
+    else if(existCheck.length > 0){
+        const reportRecipeResult = await reportRecipeService(repoter, target, crime)
+        if(reportRecipeResult){
+            baseResponse.success = true
+            baseResponse.data = null
+            baseResponse.error = null
+            return res.status(200).json(baseResponse);
+        }
+        else{
+            baseResponse.success = false
+            baseResponse.data = null
+            baseResponse.error = "데이터베이스 오류"
+            return res.status(404).json(baseResponse);      
+        }
+    }
+    else{
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "차단할 레시피 데이터가 없습니다."
+        return res.status(404).json(baseResponse);   
+    }
+
 }
 
 export const banRecipe = async(req, res)=>{
@@ -129,16 +157,36 @@ export const banRecipe = async(req, res)=>{
     const { blocked } = req.body
     const {userId} = req.verifiedToken
     const owner = userId
-    console.log(owner, blocked)
     if(!blocked){
         baseResponse.success = false
         baseResponse.data = null
         baseResponse.error = "blocked 값이 없습니다."
         return res.status(400).json(baseResponse);     
     }
-    const banRecipeResult = await banRecipeService(owner, blocked)
-    console.log("blocked result ", banRecipeResult)
-    return res.status(200).json(banRecipeResult)
+    const existCheck = await checkRecipeExists(blocked)
+    console.log("exist ", existCheck[0])
+    if(existCheck.length > 0){
+        const banRecipeResult = await banRecipeService(owner, blocked)
+        if(banRecipeResult){
+            baseResponse.success = true
+            baseResponse.data = null
+            baseResponse.error = null
+            return res.status(200).json(baseResponse);
+        }
+        else{
+            baseResponse.success = false
+            baseResponse.data = null
+            baseResponse.error = "데이터베이스 오류"
+            return res.status(404).json(baseResponse);      
+        }
+    }
+    else{
+        baseResponse.success = false
+        baseResponse.data = null
+        baseResponse.error = "차단할 레시피 데이터가 없습니다."
+        return res.status(404).json(baseResponse);           
+    }
+
 }
 
 export const thumbCategory = async(req, res)=>{

@@ -603,3 +603,9 @@ export const banRecipeDao = async(connection,owner, blocked) =>{
     const result = await connection.query(sql)
     return result
 }
+
+export const checkExistCrimeDao = async(connection, crime)=>{
+    const sql = `select id from reason_for_report where id='${crime}';`
+    const result = await connection.query(sql);
+    return result[0];
+}
