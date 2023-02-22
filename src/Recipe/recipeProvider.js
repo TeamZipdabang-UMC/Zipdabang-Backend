@@ -1,7 +1,7 @@
 import pool from "../../config/database"
 
 
-import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser, selectTempByUser, selectLastInserted, selectThumb, selectStepPicture, selectAllMyRecipes, selectStepSize } from "./recipeDao";
+import { getCategoryList, getThumbCategoryList, getCategoryPagingList, getMainCategoryList,getRecipesList, searchKeywordList,getViewPaging, checkRecipeExistsDao, selectAllOficial, selectAllUsers, selectLikes, checkUserExistsDao, checkTempSaveExists, selectChallenge, selectMyRecipes, selectMyRecipesPaging,selectLikeByUser, selectTempByUser, selectLastInserted, selectThumb, selectStepPicture, selectAllMyRecipes, selectStepSize,checkExistCrimeDao } from "./recipeDao";
 
 export const getCategoryID = async(categoryId, is_official,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
@@ -33,6 +33,12 @@ export const getCategoryPagingID = async(categoryId, last, isMain, isOfficial,us
     return result
 }
 
+export const checkExistRecipe = async(blocked)=>{
+    const connection = await pool.getConnection(async conn => conn);
+    const result = await checkExistRecipeDao(connection, blocked);
+    connection.release();
+    return result
+}
 export const getAllViewPaging = async(is_official, last,userId)=>{
     const connection = await pool.getConnection(async conn => conn);
     const result = await getViewPaging(connection, is_official, last,userId);
@@ -190,6 +196,13 @@ export const getRecipeThumb = async(recipeId) =>{
 export const getStepPictures = async(recipeId) =>{
     const connection = await pool.getConnection(async conn => conn)
     const result = await selectStepPicture(connection, recipeId)
+    connection.release()
+    return result
+}
+
+export const checkExistCrime = async(crime) =>{
+    const connection = await pool.getConnection(async conn => conn)
+    const result = await checkExistCrimeDao(connection, crime)
     connection.release()
     return result
 }
