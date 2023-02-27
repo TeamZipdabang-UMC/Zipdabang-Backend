@@ -15,9 +15,10 @@ export const startWithKakao = async(userEmail, userProfile)=>{
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
-        const adduser = checkExistEmail(userEmail)
+        const adduser = await checkExistEmail(userEmail)
         if (result > 0)
         {
+            console.log("adduser",adduser[0].Id)
             let token = await jwt.sign({
                 userId : adduser,
                 userEmail,
