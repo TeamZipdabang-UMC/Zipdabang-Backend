@@ -1,7 +1,7 @@
 import regexEmail from "regex-email";
 import privateInfo from "../../config/privateInfo";
 import { blockUser, changeNickname, deleteScraps, finishSocialLogin, quitUser, reportUser, startWithGoogle, startWithKakao } from "./userService";
-import { checkExistEmail, checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap, getUserInfoProvider, getUserNicknameProvider } from "./userProvider";
+import { checkExistEmail, checkExistNickname, getMyChallengingAll, getMyChallengingOverView, getMyCompleteAll, getMyCompleteOverView,  getMyScrapAll,  getMyScrapOverView, getNextScrap, getUserInfoProvider, getUserNicknameProvider, jailbreakProvider } from "./userProvider";
 import jwt from "jsonwebtoken"
 
 export const kakaoLogin = async(req, res) =>{
@@ -110,22 +110,8 @@ export const postUserDataSocial = async(req,res) =>{
     const result = await finishSocialLogin(dataObj);
     if (result)
     {
-        const addedUser = await checkExistEmail(email);
-        let token = await jwt.sign({
-            userId : addedUser[0].Id,
-            userEmail : email,
-        },
-        privateInfo.JWT_SECRET,
-        {
-            expiresIn : "30d",
-            subject : "userInfo"
-        });
-        
-
-        responseObj.success = true,
-        responseObj.data = token
-
-        console.log(responseObj)
+    
+        responseObj.success = true
         return res.json(responseObj);
     }
 }
@@ -432,6 +418,43 @@ export const postReportUser = async(req,res) =>{
         console.log(e)
         baseResponse.success = false
         baseResponse.error = e
+        return res.status(500).json(baseResponse)
+    }
+}
+
+export const jailbreakController = async(req,res) =>{
+    let baseResponse = {
+        success : null,
+        data : null,
+        error :null
+    }
+    if(!req.verifiedToken){
+        baseResponse.success = false
+        baseResponse.error = "no token"
+        return res.status(401).json(baseResponse)
+    }
+
+    const {userId} = req.verifiedToken
+
+    try{
+    const result = await jailbreakProvider(userId)
+    if (result == true){
+        const deleteResult = await quitUser(userId)
+        if (deleteResult > 0){
+            baseResponse.success = true
+            baseResponse.data = result
+            res.json(baseResponse)
+        }
+    }
+    else{
+        baseResponse.success = true
+        baseResponse.data = result
+        res.json(baseResponse)
+    }
+    }catch(e){
+        console.log(e.message)
+        baseResponse.success = false
+        baseResponse.error = e.message
         return res.status(500).json(baseResponse)
     }
 }

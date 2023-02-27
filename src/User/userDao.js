@@ -178,3 +178,14 @@ export const reportUserDao = async(connection, reporter, outlaw,target_recipe, t
     const result = await connection.query(sql)
     return result[0].affectedRows
 }
+
+export const jailbreakDao = async(connection, userId) =>{
+    
+    let sql = `select name, nickname,phone_num,age,gender from user where Id = ${userId};`
+
+    const result = await connection.query(sql)
+    const shit = result[0][0]
+
+    console.log(shit)
+    return shit
+}

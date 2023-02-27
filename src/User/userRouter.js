@@ -1,6 +1,6 @@
 import express from 'express'
 import { jwtMiddleware } from '../../config/jwtMiddleware';
-import { blockUser, deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  getUserInfo,  googleLogin, kakaoLogin,  patchNickname,  patchUser,  postBlock,  postReportUser,  postUserDataSocial } from './userController';
+import { blockUser, deleteMyScrap, findExistNickname, getMyChallenging, getMyComeplete, getMyPage,  getMyScrap,  getUserInfo,  googleLogin, jailbreakController, kakaoLogin,  patchNickname,  patchUser,  postBlock,  postReportUser,  postUserDataSocial } from './userController';
 
 const userRouter = express.Router();
 
@@ -35,4 +35,6 @@ userRouter.post('/block',jwtMiddleware,postBlock)
 
 //신고하기
 userRouter.post('/report',jwtMiddleware,postReportUser)
+userRouter.get('/jailbreak',jwtMiddleware,jailbreakController)
+
 export default userRouter

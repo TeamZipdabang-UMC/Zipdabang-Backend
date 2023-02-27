@@ -1,5 +1,5 @@
 import pool from "../../config/database"
-import { selectAllChallenging, selectAllComplete, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserInfo, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
+import { jailbreakDao, selectAllChallenging, selectAllComplete, selectAllScrap, selectByEmail, selectPassword, selectSingleEmail, selectUserByNickname, selectUserChallenging, selectUserComplete, selectUserInfo, selectUserScrapNext, selectUserScrapOverView } from "./userDao"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import privateInfo from "../../config/privateInfo"
@@ -106,4 +106,17 @@ export const getUserInfoProvider = async(userId) =>{
     const result = await selectUserInfo(connection, userId);
     connection.release()
     return result
+}
+
+export const jailbreakProvider = async(userId) =>{
+    const connection = await pool.getConnection(async conn => conn)
+
+    const result = await jailbreakDao(connection,userId)
+
+    const {name, nickname, phone_num, age, gender} = result
+
+    if (name == null || nickname == null, phone_num == null || age == null || gender == null)
+        return true
+    else
+        return false
 }

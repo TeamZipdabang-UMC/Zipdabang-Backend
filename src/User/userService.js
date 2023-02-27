@@ -15,12 +15,22 @@ export const startWithKakao = async(userEmail, userProfile)=>{
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
+        const adduser = checkExistEmail(userEmail)
         if (result > 0)
         {
+            let token = await jwt.sign({
+                userId : adduser,
+                userEmail,
+            },
+            privateInfo.JWT_SECRET,
+            {
+                expiresIn : "30d",
+                subject : "userInfo"
+            });
             const responseObj = {
                 status : "join",
                 email : userEmail,
-                token : null
+                token
             }
             return responseObj
         }
@@ -52,16 +62,25 @@ export const startWithGoogle = async(userEmail, userProfile) => {
     
     const isLogin = await checkExistEmail(userEmail)
 
-    console.log(isLogin)
+    console.log("is login value",isLogin.length)
     if (!(isLogin.length > 0)){
         const connection = await pool.getConnection(async conn => conn);
         const result = await createUserEmail(connection, userEmail, userProfile);
-        
+        const adduser = checkExistEmail(userEmail)
         if (result > 0){
+            let token = await jwt.sign({
+                userId : adduser,
+                userEmail,
+            },
+            privateInfo.JWT_SECRET,
+            {
+                expiresIn : "30d",
+                subject : "userInfo"
+            });
             const responseObj = {
-                status : "login",
+                status : "join",
                 email : userEmail,
-                token : null
+                token
             }
             return responseObj
         }
