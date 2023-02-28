@@ -180,7 +180,7 @@ export const reportUserDao = async(connection, reporter, outlaw,target_recipe, t
 }
 
 export const jailbreakDao = async(connection, userId) =>{
-    
+
     console.log("userId in dao", userId)
 
     console.log("sql", sql)
