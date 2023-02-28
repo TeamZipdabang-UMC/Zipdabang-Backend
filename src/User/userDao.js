@@ -181,6 +181,10 @@ export const reportUserDao = async(connection, reporter, outlaw,target_recipe, t
 
 export const jailbreakDao = async(connection, userId) =>{
     
+    console.log("userId in dao", userId)
+
+    console.log("sql", sql)
+
     let sql = `select name, nickname,phone_num,age,gender from user where Id = ${userId};`
 
     const result = await connection.query(sql)

@@ -111,6 +111,8 @@ export const getUserInfoProvider = async(userId) =>{
 export const jailbreakProvider = async(userId) =>{
     const connection = await pool.getConnection(async conn => conn)
 
+    console.log("in provider", userId)
+
     const result = await jailbreakDao(connection,userId)
 
     const {name, nickname, phone_num, age, gender} = result
