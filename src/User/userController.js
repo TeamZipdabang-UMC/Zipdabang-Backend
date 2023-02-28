@@ -436,6 +436,9 @@ export const jailbreakController = async(req,res) =>{
 
     const {userId} = req.verifiedToken
 
+
+    console.log("in jailbreak userId",req.verifiedToken)
+
     try{
     const result = await jailbreakProvider(userId)
     if (result == true){
