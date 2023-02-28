@@ -117,6 +117,8 @@ export const jailbreakProvider = async(userId) =>{
 
     const {name, nickname, phone_num, age, gender} = result
 
+    connection.release()
+
     if (name == null || nickname == null, phone_num == null || age == null || gender == null)
         return true
     else
