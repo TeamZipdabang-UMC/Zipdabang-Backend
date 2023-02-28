@@ -20,7 +20,7 @@ export const startWithKakao = async(userEmail, userProfile)=>{
         {
             console.log("adduser",adduser[0].Id)
             let token = await jwt.sign({
-                userId : adduser,
+                userId : adduser[0].Id,
                 userEmail,
             },
             privateInfo.JWT_SECRET,
@@ -70,7 +70,7 @@ export const startWithGoogle = async(userEmail, userProfile) => {
         const adduser = checkExistEmail(userEmail)
         if (result > 0){
             let token = await jwt.sign({
-                userId : adduser,
+                userId : adduser[0].Id,
                 userEmail,
             },
             privateInfo.JWT_SECRET,
